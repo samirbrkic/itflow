@@ -12,6 +12,20 @@ if (isset($_GET['type'])) {
     $type_filter = 1;
 }
 
+if ($type_filter == 1) {
+    $tag_type_display = "Client";
+} elseif ( $type_filter == 2) {
+    $tag_type_display = "Location";
+} elseif ( $type_filter == 3) {
+    $tag_type_display = "Contact";
+} elseif ( $type_filter == 4) {
+    $tag_type_display = "Credential";
+ } elseif ( $type_filter == 5) {
+    $tag_type_display = "Asset";
+} else {
+    $tag_type_display = "Unknown";
+}
+
 $sql = mysqli_query(
     $mysqli,
     "SELECT SQL_CALC_FOUND_ROWS * FROM tags
@@ -26,9 +40,9 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
 
     <div class="card card-dark">
         <div class="card-header py-2">
-            <h3 class="card-title mt-2"><i class="fas fa-fw fa-tags mr-2"></i>Tags</h3>
+            <h3 class="card-title mt-2"><i class="fas fa-fw fa-tags mr-2"></i><?= $tag_type_display ?> Tags</h3>
             <div class="card-tools">
-                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tag/tag_add.php?type=<?= $type_filter ?>"><i class="fas fa-plus mr-2"></i>New Tag</button>
+                <button type="button" class="btn btn-primary ajax-modal" data-modal-url="modals/tag/tag_add.php?type=<?= $type_filter ?>"><i class="fas fa-plus mr-2"></i>New <?= $tag_type_display ?> Tag</button>
             </div>
         </div>
 
@@ -37,7 +51,7 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                 <div class="col-sm-4 mb-2">
                     <form autocomplete="off">
                         <div class="input-group">
-                            <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(nullable_htmlentities($q)); } ?>" placeholder="Search Tags">
+                            <input type="search" class="form-control" name="q" value="<?php if (isset($q)) { echo stripslashes(nullable_htmlentities($q)); } ?>" placeholder="Search <?= $tag_type_display ?> Tags">
                             <div class="input-group-append">
                                 <button class="btn btn-primary"><i class="fa fa-search"></i></button>
                             </div>
@@ -76,7 +90,7 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                            } else {
                                echo 'btn-default';
                            } ?>">Asset</a>
-                        <a href="?<?php echo $url_query_strings_sort ?>&archived=1"
+                        <a href="?<?= $url_query_strings_sort ?>&archived=1"
                             class="btn <?php if (isset($_GET['archived'])) {
                                 echo 'btn-primary';
                             } else {
@@ -97,11 +111,6 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                                 Name <?php if ($sort == 'tag_name') { echo $order_icon; } ?>
                             </a>
                         </th>
-                        <th>
-                            <a class="text-dark" href="?<?php echo $url_query_strings_sort; ?>&sort=tag_type&order=<?php echo $disp; ?>">
-                                Type <?php if ($sort == 'tag_type') { echo $order_icon; } ?>
-                            </a>
-                        </th>
                         <th class="text-center">Action</th>
                     </tr>
                     </thead>
@@ -111,20 +120,6 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                     while ($row = mysqli_fetch_array($sql)) {
                         $tag_id = intval($row['tag_id']);
                         $tag_name = nullable_htmlentities($row['tag_name']);
-                        $tag_type = intval($row['tag_type']);
-                        if ( $tag_type == 1) {
-                            $tag_type_display = "Client Tag";
-                        } elseif ( $tag_type == 2) {
-                            $tag_type_display = "Location Tag";
-                        } elseif ( $tag_type == 3) {
-                            $tag_type_display = "Contact Tag";
-                        } elseif ( $tag_type == 4) {
-                            $tag_type_display = "Credential Tag";
-                         } elseif ( $tag_type == 5) {
-                            $tag_type_display = "Asset Tag";
-                        } else {
-                            $tag_type_display = "Unknown Tag";
-                        }
                         $tag_color = nullable_htmlentities($row['tag_color']);
                         $tag_icon = nullable_htmlentities($row['tag_icon']);
 
@@ -136,7 +131,6 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                                     <span class='badge text-light p-2 mr-1' style="background-color: <?php echo $tag_color; ?>"><i class="fa fa-fw fa-<?php echo $tag_icon; ?> mr-2"></i><?php echo $tag_name; ?></span>
                                 </a>
                             </td>
-                            <td><?php echo $tag_type_display; ?></td>
                             <td>
                                 <div class="dropdown dropleft text-center">
                                     <button class="btn btn-secondary btn-sm" type="button" data-toggle="dropdown">
@@ -165,8 +159,7 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                     </tbody>
                 </table>
             </div>
-            <?php require_once "../includes/filter_footer.php";
- ?>
+            <?php require_once "../includes/filter_footer.php"; ?>
         </div>
     </div>
 
