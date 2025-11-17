@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '981fb9585d0c76e8b9c31812d58dfdd5b56d6454',
+        'reference' => '612041635d962d37f2f400ba1974bec5456ccd1e',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '981fb9585d0c76e8b9c31812d58dfdd5b56d6454',
+            'reference' => '612041635d962d37f2f400ba1974bec5456ccd1e',
             'dev_requirement' => false,
         ),
         'carbonphp/carbon-doctrine-types' => array(
@@ -158,12 +158,12 @@
             'dev_requirement' => false,
         ),
         'symfony/http-foundation' => array(
-            'pretty_version' => 'v7.3.3',
-            'version' => '7.3.3.0',
+            'pretty_version' => 'v7.3.7',
+            'version' => '7.3.7.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/http-foundation',
             'aliases' => array(),
-            'reference' => '7475561ec27020196c49bb7c4f178d33d7d3dc00',
+            'reference' => 'db488a62f98f7a81d5746f05eea63a74e55bb7c4',
             'dev_requirement' => false,
         ),
         'symfony/polyfill-mbstring' => array(

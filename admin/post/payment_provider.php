@@ -101,6 +101,11 @@ if (isset($_GET['delete_payment_provider'])) {
     
     $provider_id = intval($_GET['delete_payment_provider']);
 
+    // When deleted it cascades deletes
+    // all Recurring paymentes related to payment provider
+    // Delete all Saved Cards related
+    // Delete Client Payment Provider Releation
+
     $provider_name = sanitizeInput(getFieldById('payment_providers', $provider_id, 'provider_name'));
 
     // Delete provider

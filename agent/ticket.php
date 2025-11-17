@@ -39,7 +39,6 @@ if (isset($_GET['ticket_id'])) {
         LEFT JOIN ticket_statuses ON ticket_status = ticket_status_id
         LEFT JOIN categories ON ticket_category = category_id
         WHERE ticket_id = $ticket_id
-        $access_permission_query
         LIMIT 1"
     );
 
@@ -358,9 +357,11 @@ if (isset($_GET['ticket_id'])) {
              <li class="breadcrumb-item">
                 <a href="tickets.php">All Tickets</a>
             </li>
+            <?php if ($client_url) { ?>
             <li class="breadcrumb-item">
                 <a href="tickets.php?client_id=<?php echo $client_id; ?>"><?= $client_name ?> Tickets</a>
             </li>
+            <?php } ?>
             <li class="breadcrumb-item active"><?php echo "$ticket_prefix$ticket_number";?></li>
         </ol>
 
@@ -415,18 +416,13 @@ if (isset($_GET['ticket_id'])) {
                                         <i class="fas fa-fw fa-ellipsis-v"></i>
                                     </button>
                                     <div class="dropdown-menu">
-                                        <a class="dropdown-item ajax-modal" href="#"
-                                            data-modal-size = "lg"
-                                            data-modal-url="modals/ticket/ticket_edit.php?id=<?= $ticket_id ?>">
-                                            <i class="fas fa-fw fa-edit mr-2"></i>Edit
-                                        </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_summary.php?ticket_id=<?= $ticket_id ?>" data-modal-size="lg">
                                             <i class="fas fa-fw fa-lightbulb mr-2"></i>Summarize
                                         </a>
                                         <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/ticket/ticket_merge.php?ticket_id=<?= $ticket_id ?>">
                                             <i class="fas fa-fw fa-clone mr-2"></i>Merge
                                         </a>
-                                        <?php if (empty($ticket_closed_at)) { ?>
+                                        <?php if (empty($ticket_closed_at) && $client_id) { ?>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item ajax-modal" href="#"
                                                 data-modal-url="modals/ticket/ticket_contact.php?id=<?= $ticket_id ?>">
@@ -564,9 +560,14 @@ if (isset($_GET['ticket_id'])) {
                 <div class="card card-dark mb-3">
 
                     <div class="card-header bg-dark">
-                        <h3 class="card-title">
+                        <h5 class="card-title">
                             Ticket Details
-                        </h3>
+                        </h5>
+                        <?php if (empty($ticket_closed_at)) { ?>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool ajax-modal" data-modal-url="modals/ticket/ticket_edit.php?id=<?= $ticket_id ?>" data-modal-size="lg"><i class="fas fa-edit"></i></button>
+                        </div>
+                        <?php } ?>
                     </div>
 
                     <div class="card-body prettyContent" id="ticketDetails">
@@ -599,9 +600,11 @@ if (isset($_GET['ticket_id'])) {
                                         <label class="btn btn-outline-dark active">
                                             <input type="radio" name="public_reply_type" value="0" checked>Internal Note
                                         </label>
+                                        <?php if ($contact_email) { ?>
                                         <label class="btn btn-outline-info">
                                             <input type="radio" name="public_reply_type" value="2">Public Comment & Email
                                         </label>
+                                        <?php } ?>
                                         <label class="btn btn-outline-info">
                                             <input type="radio" name="public_reply_type" value="1">Public Comment
                                         </label>
@@ -807,16 +810,17 @@ if (isset($_GET['ticket_id'])) {
             <div class="col-md-3">
 
                 <!-- Ticket details right card -->
-                <div class="card">
+                <div class="card <?php if(!$ticket_resolved_at) { echo "collapsed-card"; } ?>">
                     <div class="card-header">
-                        <a class="text-reset text-decoration-none" href="#" data-toggle="collapse" data-target="#ticketDetailsCard">
-                            <h5 class="card-title mt-1"><i class="fas fa-fw fa-life-ring mr-2"></i>Ticket Details</h5>
-                        </a>
+                        <h5 class="card-title"><i class="fas fa-fw fa-life-ring mr-2"></i>Ticket Details</h5>
+                
                         <div class="card-tools">
-                            <a class="fa fa-chevron-down" href="#" data-toggle="collapse" data-target="#ticketDetailsCard"></a>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="card-body collapse <?php echo !empty($ticket_resolved_at) ? 'show' : ''; ?>" id="ticketDetailsCard">
+                    <div class="card-body">
 
                         <!-- Created -->
                         <div title="<?php echo $ticket_created_at; ?>">
@@ -912,12 +916,12 @@ if (isset($_GET['ticket_id'])) {
                 <!-- Tasks Card -->
                 <?php if (empty($ticket_resolved_at) || (!empty($ticket_resolved_at) && $task_count > 0)) { ?>
                     <div class="card">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-tasks mr-2 mt-2"></i>Tasks</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-tasks mr-2"></i>Tasks</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                                 <div class="dropdown dropleft text-center">
-                                    <button class="btn btn-light text-secondary btn-sm" type="button" data-toggle="dropdown">
+                                    <button class="btn btn-tool" type="button" data-toggle="dropdown">
                                         <i class="fas fa-ellipsis-v"></i>
                                     </button>
                                     <div class="dropdown-menu">
@@ -934,8 +938,8 @@ if (isset($_GET['ticket_id'])) {
                                         </a>
                                     </div>
                                 </div>
-                                <?php } ?>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body p-0">
 
@@ -964,7 +968,7 @@ if (isset($_GET['ticket_id'])) {
                                     $task_completion_estimate = intval($row['task_completion_estimate']);
                                     $task_completed_at = nullable_htmlentities($row['task_completed_at']);
                                     ?>
-                                    <tr data-task-id="<?php echo $task_id; ?>">
+                                    <tr data-task-id="<?= $task_id ?>">
                                         <td>
                                             <?php if ($task_completed_at) { ?>
                                                 <i class="far fa-check-square text-success"></i>
@@ -1022,16 +1026,16 @@ if (isset($_GET['ticket_id'])) {
                 <!-- Contact card -->
                 <?php if ($contact_id) { ?>
                     <div class="card">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-user-check mr-2 mt-2"></i>Contact</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-user-check mr-2"></i>Contact</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
-                                    <a class="btn btn-light text-secondary btn-sm ajax-modal" href="#"
-                                        data-modal-url="modals/ticket/ticket_contact.php?id=<?= $ticket_id ?>">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                <?php } ?>
+                                <a class="btn btn-tool ajax-modal" href="#"
+                                    data-modal-url="modals/ticket/ticket_contact.php?id=<?= $ticket_id ?>">
+                                    <i class="fas fa-edit"></i>
+                                </a>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
 
@@ -1073,23 +1077,19 @@ if (isset($_GET['ticket_id'])) {
                 <?php } ?>
                 <!-- End contact card -->
 
-
-                
-
-
                 <!-- Ticket watchers card -->
                 <?php if (empty($ticket_closed_at) && mysqli_num_rows($sql_ticket_watchers) > 0) { ?>
 
                     <div class="card">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-eye mr-2 mt-2"></i>Watchers</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-eye mr-2"></i>Watchers</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
-                                    <a class="btn btn-light text-secondary btn-sm ajax-modal" href="#" data-modal-url="modals/ticket/ticket_add_watcher.php?ticket_id=<?= $ticket_id ?>">
-                                        <i class="fas fa-fw fa-plus"></i>
-                                    </a>
-                                <?php } ?>
+                                <a class="btn btn-tool ajax-modal" href="#" data-modal-url="modals/ticket/ticket_add_watcher.php?ticket_id=<?= $ticket_id ?>">
+                                    <i class="fas fa-fw fa-plus"></i>
+                                </a>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
 
@@ -1117,15 +1117,15 @@ if (isset($_GET['ticket_id'])) {
                 <!-- Asset card -->
                 <?php if ($asset_id) { ?>
                     <div class="card mb-3">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-desktop mr-2 mt-2"></i>Assets</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-desktop mr-2"></i>Assets</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
-                                    <a class="btn btn-light text-secondary btn-sm ajax-modal" href="#" data-modal-url="modals/ticket/ticket_edit_asset.php?id=<?= $ticket_id ?>">
-                                        <i class="fas fa-fw fa-edit"></i>
-                                    </a>
-                                <?php } ?>
+                                <a class="btn btn-tool ajax-modal" href="#" data-modal-url="modals/ticket/ticket_edit_asset.php?id=<?= $ticket_id ?>">
+                                    <i class="fas fa-fw fa-edit"></i>
+                                </a>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
                             <div>
@@ -1165,15 +1165,15 @@ if (isset($_GET['ticket_id'])) {
                 <!-- Vendor card -->
                 <?php if ($vendor_id) { ?>
                     <div class="card mb-3">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-building mr-2 mt-2"></i>Vendor</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-building mr-2"></i>Vendor</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
-                                    <a class="btn btn-light text-secondary btn-sm ajax-modal" href="#" data-modal-url="modals/ticket/ticket_edit_vendor.php?ticket_id=<?= $ticket_id ?>">
-                                        <i class="fas fa-fw fa-edit"></i>
-                                    </a>
-                                <?php } ?>
+                                <a class="btn btn-tool ajax-modal" href="#" data-modal-url="modals/ticket/ticket_edit_vendor.php?ticket_id=<?= $ticket_id ?>">
+                                    <i class="fas fa-fw fa-edit"></i>
+                                </a>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
 
@@ -1220,15 +1220,15 @@ if (isset($_GET['ticket_id'])) {
                 <!-- project card -->
                 <?php if ($project_id) { ?>
                     <div class="card">
-                        <div class="card-header py-2">
-                            <h5 class="card-title"><i class="fas fa-fw fa-project-diagram mr-2 mt-2"></i>Project</h5>
+                        <div class="card-header">
+                            <h5 class="card-title"><i class="fas fa-fw fa-project-diagram mr-2"></i>Project</h5>
+                            <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
                             <div class="card-tools">
-                                <?php if (empty($ticket_resolved_at) && lookupUserPermission("module_support") >= 2) { ?>
-                                    <button type="button" class="btn btn-light text-secondary btn-sm ajax-modal" data-modal-url="modals/ticket/ticket_edit_project.php?id=<?= $ticket_id ?>">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                <?php } ?>
+                                <button type="button" class="btn btn-tool ajax-modal" data-modal-url="modals/ticket/ticket_edit_project.php?id=<?= $ticket_id ?>">
+                                    <i class="fas fa-edit"></i>
+                                </button>
                             </div>
+                            <?php } ?>
                         </div>
                         <div class="card-body">
                             <div>

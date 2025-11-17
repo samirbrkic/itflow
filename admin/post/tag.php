@@ -28,7 +28,7 @@ if (isset($_POST['edit_tag'])) {
 
     $tag_id = intval($_POST['tag_id']);
 
-    mysqli_query($mysqli,"UPDATE tags SET tag_name = '$name', tag_type = $type, tag_color = '$color', tag_icon = '$icon' WHERE tag_id = $tag_id");
+    mysqli_query($mysqli,"UPDATE tags SET tag_name = '$name', tag_color = '$color', tag_icon = '$icon' WHERE tag_id = $tag_id");
 
     logAction("Tag", "Edit", "$session_name edited tag $name", 0, $tag_id);
 

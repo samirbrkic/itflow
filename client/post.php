@@ -49,7 +49,7 @@ if (isset($_POST['add_ticket'])) {
         $details = removeEmoji($details);
 
         $email_subject = "ITFlow - New Ticket - $client_name: $subject";
-        $email_body = "Hello, <br><br>This is a notification that a new ticket has been raised in ITFlow. <br>Client: $client_name<br>Priority: $priority<br>Link: https://$config_base_url/ticket.php?ticket_id=$ticket_id <br><br><b>$subject</b><br>$details";
+        $email_body = "Hello, <br><br>This is a notification that a new ticket has been raised in ITFlow. <br>Client: $client_name<br>Priority: $priority<br>Link: https://$config_base_url/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id <br><br><b>$subject</b><br>$details";
 
         // Queue Mail
         $data = [
@@ -113,7 +113,7 @@ if (isset($_POST['add_ticket_comment'])) {
             $tech_name = sanitizeInput($tech_details['user_name']);
 
             $subject = "$config_app_name Ticket updated - [$config_ticket_prefix$ticket_number] $ticket_subject";
-            $body    = "Hello $tech_name,<br><br>A new reply has been added to the below ticket, check ITFlow for full details.<br><br>Client: $client_name<br>Ticket: $config_ticket_prefix$ticket_number<br>Subject: $ticket_subject<br><br>https://$config_base_url/ticket.php?ticket_id=$ticket_id";
+            $body    = "Hello $tech_name,<br><br>A new reply has been added to the below ticket, check ITFlow for full details.<br><br>Client: $client_name<br>Ticket: $config_ticket_prefix$ticket_number<br>Subject: $ticket_subject<br><br>https://$config_base_url/agent/ticket.php?ticket_id=$ticket_id&client_id=$session_client_id";
 
             $data = [
                 [
@@ -440,7 +440,7 @@ if (isset($_GET['add_payment_by_provider'])) {
     $sql = mysqli_query($mysqli,"SELECT * FROM invoices
             LEFT JOIN clients ON invoice_client_id = client_id
             LEFT JOIN contacts ON client_id = contact_client_id AND contact_primary = 1
-            WHERE invoice_id = $invoice_id"
+            WHERE invoice_id = $invoice_id AND client_id = $session_client_id"
     );
     $row = mysqli_fetch_array($sql);
     $invoice_number = intval($row['invoice_number']);

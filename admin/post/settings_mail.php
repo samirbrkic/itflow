@@ -150,7 +150,7 @@ if (isset($_POST['test_email_smtp'])) {
     $mail = addToMailQueue($data);
 
     if ($mail === true) {
-        flash_alert("Test email queued! <a class='text-bold text-light' href='admin_mail_queue.php'>Check Admin > Mail queue</a>");
+        flash_alert("Test email queued! <a class='text-bold text-light' href='mail_queue.php'>Check Admin > Mail queue</a>");
     } else {
         flash_alert("Failed to add test mail to queue", 'error');
     }
@@ -160,27 +160,128 @@ if (isset($_POST['test_email_smtp'])) {
 }
 
 if (isset($_POST['test_email_imap'])) {
-    
+
     validateCSRFToken($_POST['csrf_token']);
 
-    // Setup your IMAP connection parameters
-    $hostname = "{" . $config_imap_host . ":" . $config_imap_port . "/" . $config_imap_encryption . "/novalidate-cert}INBOX";
-    $username = $config_imap_username;
-    $password = $config_imap_password;
+    $host       = $config_imap_host;
+    $port       = (int) $config_imap_port;
+    $encryption = strtolower(trim($config_imap_encryption)); // e.g. "ssl", "tls", "none"
+    $username   = $config_imap_username;
+    $password   = $config_imap_password;
+
+    // Build remote socket (implicit SSL vs plain TCP)
+    $transport = 'tcp';
+    if ($encryption === 'ssl') {
+        $transport = 'ssl';
+    }
+
+    $remote_socket = $transport . '://' . $host . ':' . $port;
+
+    // Stream context (you can tighten these if you want strict validation)
+    $contextOptions = [];
+    if (in_array($encryption, ['ssl', 'tls'], true)) {
+        $contextOptions['ssl'] = [
+            'verify_peer'       => false,
+            'verify_peer_name'  => false,
+            'allow_self_signed' => true,
+        ];
+    }
+
+    $context = stream_context_create($contextOptions);
 
     try {
-        $inbox = @imap_open($hostname, $username, $password);
+        $errno  = 0;
+        $errstr = '';
 
-        if ($inbox) {
-            imap_close($inbox);
+        // 10-second timeout, adjust as needed
+        $fp = @stream_socket_client(
+            $remote_socket,
+            $errno,
+            $errstr,
+            10,
+            STREAM_CLIENT_CONNECT,
+            $context
+        );
+
+        if (!$fp) {
+            throw new Exception("Could not connect to IMAP server: [$errno] $errstr");
+        }
+
+        stream_set_timeout($fp, 10);
+
+        // Read server greeting (IMAP servers send something like: * OK Dovecot ready)
+        $greeting = fgets($fp, 1024);
+        if ($greeting === false || strpos($greeting, '* OK') !== 0) {
+            fclose($fp);
+            throw new Exception("Invalid IMAP greeting: " . trim((string) $greeting));
+        }
+
+        // If you really want STARTTLS for "tls" (port 143), you can do it here
+        if ($encryption === 'tls' && stripos($greeting, 'STARTTLS') !== false) {
+            // Request STARTTLS
+            fwrite($fp, "A0001 STARTTLS\r\n");
+            $line = fgets($fp, 1024);
+            if ($line === false || stripos($line, 'A0001 OK') !== 0) {
+                fclose($fp);
+                throw new Exception("STARTTLS failed: " . trim((string) $line));
+            }
+
+            // Enable crypto on the stream
+            if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
+                fclose($fp);
+                throw new Exception("Unable to enable TLS encryption on IMAP connection.");
+            }
+        }
+
+        // --- Do LOGIN command ---
+        $tag = 'A0002';
+
+        // Simple quoting; this may fail with some special chars in username/password.
+        $loginCmd = sprintf(
+            "%s LOGIN \"%s\" \"%s\"\r\n",
+            $tag,
+            addcslashes($username, "\\\""),
+            addcslashes($password, "\\\"")
+        );
+
+        fwrite($fp, $loginCmd);
+
+        $success   = false;
+        $errorLine = '';
+
+        while (!feof($fp)) {
+            $line = fgets($fp, 2048);
+            if ($line === false) {
+                break;
+            }
+
+            // Look for tagged response for our LOGIN
+            if (strpos($line, $tag . ' ') === 0) {
+                if (stripos($line, $tag . ' OK') === 0) {
+                    $success = true;
+                } else {
+                    $errorLine = trim($line);
+                }
+                break;
+            }
+        }
+
+        // Always logout / close
+        fwrite($fp, "A0003 LOGOUT\r\n");
+        fclose($fp);
+
+        if ($success) {
             flash_alert("Connected successfully");
         } else {
-            throw new Exception(imap_last_error());
+            if (!$errorLine) {
+                $errorLine = 'Unknown IMAP authentication error';
+            }
+            throw new Exception($errorLine);
         }
+
     } catch (Exception $e) {
-        flash_alert("<strong>IMAP connection failed:</strong> " . $e->getMessage(), 'error');
+        flash_alert("<strong>IMAP connection failed:</strong> " . htmlspecialchars($e->getMessage()), 'error');
     }
 
     redirect();
-
 }

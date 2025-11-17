@@ -106,12 +106,14 @@ $num_rows = mysqli_num_rows($sql);
                                         <i class="fas fa-fw fa-edit mr-2"></i>Edit
                                     </a>
                                     <div class="dropdown-divider"></div>
-<!--                                    <a class="dropdown-item text-danger confirm-link" href="post.php?disable_payment_provider=--><?php //echo $provider_id; ?><!--&csrf_token=--><?php //echo $_SESSION['csrf_token'] ?><!--">-->
-<!--                                        <i class="fas fa-fw fa-thumbs-down mr-2"></i>Disable-->
-<!--                                    </a>-->
-<!--                                    <a class="dropdown-item text-danger confirm-link" href="post.php?delete_payment_provider=--><?php //echo $provider_id; ?><!--&csrf_token=--><?php //echo $_SESSION['csrf_token'] ?><!--">-->
-<!--                                        <i class="fas fa-fw fa-trash mr-2"></i>Delete-->
-<!--                                    </a>-->
+                                    <a class="dropdown-item text-danger confirm-link" href="post.php?delete_payment_provider=<?= $provider_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>">
+                                        <i class="fas fa-fw fa-trash mr-2"></i><strong>Delete Provider and</strong>
+                                        <ul class="text-xs">
+                                            <li>Related Recurring Payments</li>
+                                            <li>Related Saved cards</li>
+                                            <li>Client Provider Relations</li>
+                                        </ul>
+                                    </a>
                                 </div>
                             </div>
                         </td>

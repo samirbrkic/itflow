@@ -42,7 +42,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
         try {
             // Initialize stripe
-            require_once 'plugins/stripe-php/init.php';
+            require_once '../plugins/stripe-php/init.php';
             $stripe = new \Stripe\StripeClient($private_key);
 
             // Detach PM
@@ -56,7 +56,7 @@ if (isset($_GET['delete_saved_payment'])) {
 
     }
 
-    // Remove payment method from ITFlow
+    // Remove payment method from ITFlow. This will also cascade delete related recurring payments setup
     mysqli_query($mysqli, "DELETE FROM client_saved_payment_methods WHERE saved_payment_id = $saved_payment_id");
 
     // SQL Cascade delete will Remove All Associated Auto Payment Methods on recurring invoices in the recurring payments table.

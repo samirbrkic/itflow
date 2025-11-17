@@ -344,8 +344,6 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                             $recurring_invoice_display = "-";
                         }
 
-                        
-
                         $now = time();
 
                         if (($invoice_status == "Sent" || $invoice_status == "Partial" || $invoice_status == "Viewed") && strtotime($invoice_due) + 86400 < $now) {
@@ -355,6 +353,15 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                         }
 
                         $invoice_badge_color = getInvoiceBadgeColor($invoice_status);
+
+                        // Saved Payment Methods
+                        $sql_saved_payment_methods = mysqli_query($mysqli, "
+                            SELECT * FROM client_saved_payment_methods
+                            LEFT JOIN payment_providers 
+                                ON client_saved_payment_methods.saved_payment_provider_id = payment_providers.payment_provider_id
+                            WHERE saved_payment_client_id = $client_id
+                            AND payment_provider_active = 1;
+                        ");
 
                         ?>
 
@@ -395,10 +402,8 @@ $num_rows = mysqli_fetch_row(mysqli_query($mysqli, "SELECT FOUND_ROWS()"));
                                                 <i class="fa fa-fw fa-credit-card mr-2"></i>Add Payment
                                             </a>
                                             <div class="dropdown-divider"></div>
-                                            <?php if ($invoice_status !== 'Partial' && $config_stripe_enable && $stripe_id && $stripe_pm) { ?>
-                                                <a class="dropdown-item confirm-link" href="post.php?add_payment_stripe&invoice_id=<?php echo $invoice_id; ?>&csrf_token=<?php echo $_SESSION['csrf_token']; ?>">
-                                                    <i class="fa fa-fw fa-credit-card mr-2"></i>Pay via saved card
-                                                </a>
+                                            <?php if (mysqli_num_rows($sql_saved_payment_methods) > 0 && ($invoice_status === 'Sent' || $invoice_status === 'Viewed')) { ?>
+                                                <a class="dropdown-item ajax-modal" href="#" data-modal-url="modals/payment/payment_saved_method_add.php?id=<?= $invoice_id ?>"><i class="fas fa-fw fa-wallet mr-2"></i>Pay with Saved Card</a>
                                                 <div class="dropdown-divider"></div>
                                             <?php } ?>
                                         <?php } ?>

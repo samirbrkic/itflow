@@ -38,33 +38,35 @@ while ($row = mysqli_fetch_array($sql_additional_assets)) {
 ob_start();
 ?>
 <div class="modal-header bg-dark">
-    <h5 class="modal-title"><i class="fa fa-fw fa-life-ring mr-2"></i>Editing ticket: <strong><?php echo "$ticket_prefix$ticket_number"; ?></strong> - <?php echo $client_name; ?></h5>
+    <h5 class="modal-title"><i class="fa fa-fw fa-life-ring mr-2"></i>Ticket: <strong><?= "$ticket_prefix$ticket_number" ?></strong> - <?= $client_name ?></h5>
     <button type="button" class="close text-white" data-dismiss="modal">
         <span>&times;</span>
     </button>
 </div>
 <form action="post.php" method="post" autocomplete="off">
-    <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
+    <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
 
     <div class="modal-body">
-
+        <?php if ($client_id) { ?>
         <ul class="nav nav-pills nav-justified mb-3">
             <li class="nav-item">
-                <a class="nav-link active" data-toggle="pill" href="#pills-details<?php echo $ticket_id; ?>"><i class="fa fa-fw fa-life-ring mr-2"></i>Details</a>
+                <a class="nav-link active" data-toggle="pill" href="#pills-details"><i class="fa fa-fw fa-life-ring mr-2"></i>Details</a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="pill" href="#pills-contacts"><i class="fa fa-fw fa-users mr-2"></i>Contact</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-contacts<?php echo $ticket_id; ?>"><i class="fa fa-fw fa-users mr-2"></i>Contact</a>
+                <a class="nav-link" data-toggle="pill" href="#pills-assignment"><i class="fa fa-fw fa-desktop mr-2"></i>Assignment</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-assignment<?php echo $ticket_id; ?>"><i class="fa fa-fw fa-desktop mr-2"></i>Assignment</a>
-            </li>
+            
         </ul>
-
         <hr>
-
+        <?php } ?>
+        
         <div class="tab-content" <?php if (lookupUserPermission('module_support') <= 1) { echo 'inert'; } ?>>
 
-            <div class="tab-pane fade show active" id="pills-details<?php echo $ticket_id; ?>">
+            <div class="tab-pane fade show active" id="pills-details">
 
                 <div class="form-group">
                     <label>Subject <strong class="text-danger">*</strong></label>
@@ -182,7 +184,9 @@ ob_start();
 
             </div>
 
-            <div class="tab-pane fade" id="pills-contacts<?php echo $ticket_id; ?>">
+            <?php if ($client_id) { ?>
+
+            <div class="tab-pane fade" id="pills-contacts">
 
                 <div class="form-group">
                     <label>Contact</label>
@@ -236,7 +240,7 @@ ob_start();
 
             </div>
 
-            <div class="tab-pane fade" id="pills-assignment<?php echo $ticket_id; ?>">
+            <div class="tab-pane fade" id="pills-assignment">
 
                 <div class="form-group">
                     <label>Asset</label>
@@ -372,7 +376,7 @@ ob_start();
                             while ($row = mysqli_fetch_array($sql_projects)) {
                                 $project_id_select = intval($row['project_id']);
                                 $project_name_select = nullable_htmlentities($row['project_name']); ?>
-                                <option <?php if ($project_id == $project_id_select) { echo "selected"; } ?> value="<?php echo $project_id_select; ?>"><?php echo $project_name_select; ?></option>
+                                <option <?php if ($project_id == $project_id_select) { echo "selected"; } ?> value="<?= $project_id_select ?>"><?= $project_name_select ?></option>
 
                             <?php } ?>
                         </select>
@@ -380,13 +384,14 @@ ob_start();
                 </div>
 
             </div>
+            <?php } // End client_id check ?>
 
         </div>
 
     </div>
 
     <div class="modal-footer">
-        <button type="submit" name="edit_ticket" class="btn btn-primary text-bold"><i class="fa fa-check mr-2"></i>Save</button>
+        <button type="submit" name="edit_ticket" class="btn btn-primary text-bold"><i class="fa fa-check mr-2"></i>Save changes</button>
         <button type="button" class="btn btn-light" data-dismiss="modal"><i class="fa fa-times mr-2"></i>Cancel</button>
     </div>
 
