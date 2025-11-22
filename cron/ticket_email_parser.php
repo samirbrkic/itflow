@@ -83,8 +83,16 @@ function addTicket($contact_id, $contact_name, $contact_email, $client_id, $date
 
     // Clean up the message
     $message = trim($message);
+    // Remove DOCTYPE and meta tags
+    $message = preg_replace('/<!DOCTYPE[^>]*>/i', '', $message);
+    $message = preg_replace('/<meta[^>]*>/i', '', $message);
+    // Remove <html>, <head>, <body> and their closing tags
+    $message = preg_replace('/<\/?(html|head|body)[^>]*>/i', '', $message);
+    // Collapse excess whitespace
     $message = preg_replace('/\s+/', ' ', $message);
+    // Convert newlines to <br>
     $message = nl2br($message);
+    // Wrap final formatted message
     $message = "<i>Email from: <b>$contact_name</b> &lt;$contact_email&gt; at $date:-</i> <br><br><div style='line-height:1.5;'>$message</div>";
 
     $ticket_prefix_esc = mysqli_real_escape_string($mysqli, $config_ticket_prefix);
@@ -181,13 +189,37 @@ function addReply($from_email, $date, $subject, $ticket_number, $message, $attac
     global $mysqli, $config_app_name, $company_name, $company_phone, $config_ticket_prefix, $config_base_url, $config_ticket_from_name, $config_ticket_from_email, $allowed_extensions;
 
     $ticket_reply_type = 'Client';
-    $message_parts = explode("##- Please type your reply above this line -##", $message);
-    $message_body = $message_parts[0];
-    $message_body = trim($message_body);
-    $message_body = preg_replace('/\r\n|\r|\n/', ' ', $message_body);
-    $message_body = nl2br($message_body);
+    // $message contains the raw HTML body from IMAP
 
-    $message = "<i>Email from: $from_email at $date:-</i> <br><br><div style='line-height:1.5;'>$message_body</div>";
+    // 1) Remove the reply separator and everything below it (HTML-aware)
+    // This matches: <i ...>##- Please type your reply above this line -##</i> and EVERYTHING after it
+    $message = preg_replace(
+        '/<i[^>]*>##-\s*Please\s+type\s+your\s+reply\s+above\s+this\s+line\s*-##<\/i>.*$/is',
+        '',
+        $message
+    );
+
+    // 2) Clean up the remaining message
+
+    // Remove DOCTYPE and meta tags
+    $message = preg_replace('/<!DOCTYPE[^>]*>/i', '', $message);
+    $message = preg_replace('/<meta[^>]*>/i', '', $message);
+
+    // Remove <html>, <head>, <body> and their closing tags
+    $message = preg_replace('/<\/?(html|head|body)[^>]*>/i', '', $message);
+
+    // Trim leading/trailing whitespace
+    $message = trim($message);
+
+    // Normalize line breaks to spaces
+    $message = preg_replace('/\r\n|\r|\n/', ' ', $message);
+
+    // Convert to <br> for HTML display
+    $message = nl2br($message);
+
+    // 3) Final wrapper
+    $message = "<i>Email from: $from_email at $date:-</i><br><br>
+    <div style='line-height:1.5;'>$message</div>";
 
     $ticket_number_esc = intval($ticket_number);
     $message_esc = mysqli_real_escape_string($mysqli, $message);

@@ -186,10 +186,7 @@ function sendQueueEmail(
     $mail->addAddress($to_email, $to_name);
     $mail->isHTML(true);
     $mail->Subject = $subject;
-    $mail->Body = "<html><head><style>
-        body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
-        .email-container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-    </style></head><body><div class='email-container'>{$html_body}</div></body></html>";
+    $mail->Body = $html_body;
 
     if (!empty($ics_str)) {
         $mail->addStringAttachment($ics_str, 'Scheduled_ticket.ics', 'base64', 'text/calendar');
