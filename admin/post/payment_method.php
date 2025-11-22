@@ -10,10 +10,17 @@ if (isset($_POST['add_payment_method'])) {
 
     validateCSRFToken($_POST['csrf_token']);
 
-    $name = sanitizeInput($_POST['name']);
-    $description = sanitizeInput($_POST['description']);
+    $name = cleanInput($_POST['name']);
+    $description = cleanInput($_POST['description']);
 
-    mysqli_query($mysqli,"INSERT INTO payment_methods SET payment_method_name = '$name', payment_method_description = '$description'");
+    $query = mysqli_prepare(
+        $mysqli, "INSERT INTO payment_methods
+        SET payment_method_name = ?, payment_method_description = ?"
+    );
+
+    mysqli_stmt_bind_param($query, "ss", $name, $description);
+    
+    mysqli_stmt_execute($query);
 
     logAction("Payment Method", "Create", "$session_name created Payment Method $name");
 
@@ -26,12 +33,21 @@ if (isset($_POST['add_payment_method'])) {
 if (isset($_POST['edit_payment_method'])) {
 
     validateCSRFToken($_POST['csrf_token']);
-
+    
     $payment_method_id = intval($_POST['payment_method_id']);
-    $name = sanitizeInput($_POST['name']);
-    $description = sanitizeInput($_POST['description']);
+    $name = cleanInput($_POST['name']);
+    $description = cleanInput($_POST['description']);
 
-    mysqli_query($mysqli,"UPDATE payment_methods SET payment_method_name = '$name', payment_method_description = '$description' WHERE payment_method_id = $payment_method_id");
+    $query = mysqli_prepare(
+        $mysqli,
+        "UPDATE payment_methods 
+         SET payment_method_name = ?, payment_method_description = ? 
+         WHERE payment_method_id = ?"
+    );
+
+    mysqli_stmt_bind_param($query, "ssi", $name, $description, $payment_method_id);
+
+    mysqli_stmt_execute($query);
 
     logAction("Payment Method", "Edit", "$session_name edited Payment Method $name");
 
