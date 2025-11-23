@@ -4,6 +4,8 @@ config.php
 uploads/favicon.ico
 uploads/clients/*
 !uploads/clients/index.php
+uploads/custom/*
+!uploads/custom/index.php
 uploads/documents/*
 !uploads/documents/index.php
 uploads/document_templates/*
