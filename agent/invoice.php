@@ -277,7 +277,8 @@ if (isset($_GET['invoice_id'])) {
                                     data-modal-url="modals/invoice/invoice_copy.php?id=<?= $invoice_id ?>">
                                     <i class="fa fa-fw fa-copy text-secondary mr-2"></i>Copy
                                 </a>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#addInvoiceRecurringModal<?php echo $invoice_id; ?>">
+                                <a class="dropdown-item ajax-modal" href="#"
+                                    data-modal-url="modals/invoice/invoice_recurring_add.php?invoice_id=<?= $invoice_id ?>">
                                     <i class="fa fa-fw fa-sync-alt text-secondary mr-2"></i>Recurring
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -725,7 +726,6 @@ if (isset($_GET['invoice_id'])) {
         </div>
     <?php
     include_once "modals/invoice/invoice_add_ticket.php";
-    include_once "modals/invoice/invoice_recurring_add.php";
     include_once "modals/invoice/invoice_note.php";
 
 }
