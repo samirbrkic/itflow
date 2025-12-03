@@ -285,7 +285,8 @@ if (mysqli_num_rows($sql_queue) > 0) {
 /** =======================================================================
  *  RETRIES: status = 2 (Failed), attempts < 4, wait 30 min
  *  NOTE: Backoff is `email_failed_at <= NOW() - INTERVAL 30 MINUTE`
- * =======================================================================*/
+ * =======================================================================
+ */
 $sql_failed_queue = mysqli_query(
     $mysqli,
     "SELECT * FROM email_queue
