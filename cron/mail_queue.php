@@ -223,14 +223,24 @@ if (mysqli_num_rows($sql_queue) > 0) {
 
         mysqli_query($mysqli, "UPDATE email_queue SET email_status = 1 WHERE email_id = $email_id");
 
-        // Check recipient
-        $domain = sanitizeInput(substr($email_recipient, strpos($email_recipient, '@') + 1));
-        if (!filter_var($email_recipient, FILTER_VALIDATE_EMAIL) || !checkdnsrr($domain, 'MX')) {
+        // Basic recipient syntax check
+        if (!filter_var($email_recipient, FILTER_VALIDATE_EMAIL)) {
             mysqli_query($mysqli, "UPDATE email_queue SET email_status = 2, email_attempts = 99 WHERE email_id = $email_id");
             $email_to_logging = sanitizeInput($email_recipient);
             $email_subject_logging = sanitizeInput($rowq['email_subject']);
             logApp("Cron-Mail-Queue", "Error", "Failed to send email: $email_id to $email_to_logging due to invalid recipient address. Email subject was: $email_subject_logging");
             appNotify("Mail", "Failed to send email #$email_id to $email_to_logging due to invalid recipient address: Email subject was: $email_subject_logging");
+            continue;
+        }
+
+        // More intelligent recipient MX check (if not disabled with --no-mx-validation)
+        $domain = sanitizeInput(substr($email_recipient, strpos($email_recipient, '@') + 1));
+        if (!in_array('--no-mx-validation', $argv) && !checkdnsrr($domain, 'MX')) {
+            mysqli_query($mysqli, "UPDATE email_queue SET email_status = 2, email_attempts = 99 WHERE email_id = $email_id");
+            $email_to_logging = sanitizeInput($email_recipient);
+            $email_subject_logging = sanitizeInput($rowq['email_subject']);
+            logApp("Cron-Mail-Queue", "Error", "Failed to send email: $email_id to $email_to_logging due to invalid recipient domain (no MX). Email subject was: $email_subject_logging");
+            appNotify("Mail", "Failed to send email #$email_id to $email_to_logging due to invalid recipient domain (no MX): Email subject was: $email_subject_logging");
             continue;
         }
 
