@@ -905,12 +905,14 @@ if (isset($_GET['ai_ticket_summary'])) {
     }
 
     $prompt = "
+    **IMPORTANT: Always respond in the same language as the ticket content (German, English, etc.). Detect the language from the ticket details and replies provided below.**
+    
     Summarize the following IT support ticket and its responses in a concise, clear, and professional manner. 
     The summary should include:
 
-    1. Main Issue: What was the problem reported by the user?
-    2. Actions Taken: What steps were taken to address the issue?
-    3. Resolution or Next Steps: Was the issue resolved or is it ongoing?
+    1. The main issue or problem reported by the user
+    2. The actions taken to address the issue
+    3. The resolution status or next steps
 
     Please ensure:
     - If there are multiple issues, summarize each separately.
@@ -930,7 +932,7 @@ if (isset($_GET['ai_ticket_summary'])) {
 
     Formatting instructions:
     - Use valid HTML tags only.
-    - Use <h3> for section headers (Main Issue, Actions Taken, Resolution).
+    - Use <h3> for section headers. Create appropriate headers in the same language as the ticket content (e.g., \"Hauptproblem\" for German, \"Main Issue\" for English).
     - Use <ul><li> for bullet points under each section.
     - Do NOT wrap the output in ```html or any other code fences.
     - Do NOT include <html>, <head>, or <body>.
@@ -942,7 +944,7 @@ if (isset($_GET['ai_ticket_summary'])) {
     $post_data = [
         "model" => "$model_name",
         "messages" => [
-            ["role" => "system", "content" => "Your task is to summarize IT support tickets with clear, concise details."],
+            ["role" => "system", "content" => "Your task is to summarize IT support tickets with clear, concise details. Always respond in the same language as the ticket content."],
             ["role" => "user", "content" => $prompt]
         ],
         "temperature" => 0.3

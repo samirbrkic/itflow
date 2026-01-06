@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket geschlossen</title>
+    <style>
+        /* Email Client Compatibility Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f4f6f9;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        img {
+            border: 0;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+        }
+        
+        /* Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .email-header img {
+            max-width: 180px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        
+        .email-header h1 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 10px 0 0 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Content Area */
+        .email-content {
+            background-color: #ffffff;
+            padding: 40px 30px;
+        }
+        
+        .email-greeting {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .email-intro {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        /* Reply Instruction Line */
+        .reply-instruction {
+            font-size: 12px;
+            color: #a0aec0;
+            font-style: italic;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        /* Ticket Details Box */
+        .ticket-details-box {
+            background-color: #f7fafc;
+            border-left: 4px solid #667eea;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        
+        .ticket-details-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ticket-details-title::before {
+            content: "🎫";
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .ticket-details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ticket-details-table tr {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .ticket-details-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .ticket-details-table td {
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .ticket-details-table td:first-child {
+            font-weight: 600;
+            color: #4a5568;
+            width: 120px;
+        }
+        
+        .ticket-details-table td:last-child {
+            color: #2d3748;
+        }
+        
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-priority-low {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-priority-medium {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-priority-high {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .badge-priority-critical {
+            background-color: #fc8181;
+            color: #ffffff;
+        }
+        
+        .badge-status {
+            background-color: #bee3f8;
+            color: #2c5282;
+        }
+        
+        /* Content Section */
+        .content-section {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .content-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .content-section-body {
+            font-size: 14px;
+            color: #2d3748;
+            line-height: 1.7;
+        }
+        
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Footer */
+        .email-footer {
+            background-color: #2d3748;
+            color: #cbd5e0;
+            padding: 30px 30px;
+            text-align: center;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .email-footer-text {
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0 0 15px 0;
+        }
+        
+        .email-footer-company {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+        
+        .email-footer-contact {
+            font-size: 12px;
+            color: #a0aec0;
+            margin: 5px 0;
+        }
+        
+        .email-footer-contact a {
+            color: #90cdf4;
+            text-decoration: none;
+        }
+        
+        .email-footer-divider {
+            height: 1px;
+            background-color: #4a5568;
+            margin: 20px 0;
+        }
+        
+        .email-footer-legal {
+            font-size: 11px;
+            color: #718096;
+            line-height: 1.5;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            
+            .email-content {
+                padding: 30px 20px !important;
+            }
+            
+            .email-header {
+                padding: 25px 15px !important;
+            }
+            
+            .email-footer {
+                padding: 25px 20px !important;
+            }
+            
+            .ticket-details-table td:first-child {
+                width: 100px;
+                font-size: 12px;
+            }
+            
+            .button {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .email-content {
+                background-color: #1a202c;
+                color: #e2e8f0;
+            }
+            
+            .ticket-details-box {
+                background-color: #2d3748;
+            }
+            
+            .content-section {
+                background-color: #2d3748;
+                border-color: #4a5568;
+            }
+        }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6f9;">
+    <!-- Wrapper -->
+    <table role="presentation" style="width: 100%; background-color: #f4f6f9; padding: 20px 0;">
+        <tr>
+            <td align="center">
+                <!-- Email Container -->
+                <table class="email-container" role="presentation" style="max-width: 600px; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 8px;">
+                    
+                    <!-- Reply Instruction (at the very top) -->
+                    <tr>
+                        <td style="background-color: #ffffff; padding: 15px 30px 0 30px;">
+                            <div class="reply-instruction" style="font-size: 11px; color: #9ca3af; font-style: italic; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 0;">
+                                <i style="color: #808080">##- Please type your reply above this line -##</i>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td class="email-header" style="background-color: #ffffff; padding: 30px 20px 25px 20px; text-align: center; border-bottom: 3px solid #667eea;">
+                            <img src="" alt="IT Support" style="max-width: 200px; height: auto; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+                            <div style="display: inline-block; background-color: #667eea; background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);">
+                                <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">Ticket geschlossen</h1>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td class="email-content" style="background-color: #ffffff; padding: 20px 25px;">
+                            
+                            <!-- Greeting -->
+                            <div class="email-greeting" style="font-size: 16px; color: #2d3748; margin-bottom: 8px; font-weight: 600;">
+                                Hallo Stefan Weber,
+                            </div>
+                            
+                            <!-- Intro Text -->
+                            <div class="email-intro" style="font-size: 14px; color: #4a5568; line-height: 1.5; margin-bottom: 20px;">
+                                Ihr Support-Ticket wurde erfolgreich geschlossen.
+                            </div>
+                            
+                            <!-- Main Content (will be replaced by specific templates) -->
+                            <!-- Ticket Closed Template - Will be embedded in base_template.html -->
+
+<!-- Ticket Details Box -->
+<div class="ticket-details-box" style="background: linear-gradient(to right, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px 20px; margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <div class="ticket-details-title" style="font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+        🔒 Ticket-Details
+    </div>
+    
+    <table class="ticket-details-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280; width: 110px;">
+                Ticket:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">
+                #2025005
+            </td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                Betreff:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937;">
+                Monitor zeigt kein Bild
+            </td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                Status:
+            </td>
+            <td style="padding: 8px 0;">
+                <span style="display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #ffffff; background-color: #6c757d;">
+                    Geschlossen
+                </span>
+            </td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                Priorität:
+            </td>
+            <td style="padding: 8px 0;">
+                <span style="display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #ffffff; background-color: #dc3545;">
+                    High
+                </span>
+            </td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                Zugewiesen an:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937;">
+                Lisa IT-Support
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                Geschlossen am:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937;">
+                30.12.2025 09:01
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- View Ticket Button -->
+<div style="text-align: center; margin: 24px 0 20px 0;">
+    <!--[if mso]>
+    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://portal.samix.one/guest/guest_view_ticket.php?ticket_id=128&url_key=mno112" style="height:44px;v-text-anchor:middle;width:180px;" arcsize="15%" strokecolor="#667eea" fillcolor="#667eea">
+        <w:anchorlock/>
+        <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:bold;">Ticket anzeigen</center>
+    </v:roundrect>
+    <![endif]-->
+    <!--[if !mso]><!-->
+    <a href="https://portal.samix.one/guest/guest_view_ticket.php?ticket_id=128&url_key=mno112" style="display: inline-block; background-color: #667eea; background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0.3px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.2s;">
+        Ticket anzeigen
+    </a>
+    <!--<![endif]-->
+</div>
+
+<!-- Contact Support Info -->
+<div style="background-color: #f9fafb; border-radius: 6px; padding: 12px; margin: 16px 0 0 0; text-align: center;">
+    <p style="margin: 0; font-size: 12px; color: #6b7280; line-height: 1.6;">
+        Dieses Ticket ist nun geschlossen. Bitte antworten Sie nicht auf diese E-Mail, da Antworten nicht im System erfasst werden und für unser Support-Team nicht sichtbar sind. Bei weiteren Fragen zum selben Thema erstellen Sie bitte ein neues Ticket und referenzieren Sie dabei diese Ticketnummer: #2025005
+    </p>
+</div>
+
+<!-- Thank You Message -->
+<div style="background-color: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 14px 18px; margin: 16px 0 0 0; text-align: center;">
+    <p style="margin: 0; font-size: 13px; color: #166534; font-weight: 600;">
+        🙏 Vielen Dank für Ihr Vertrauen.
+    </p>
+</div>
+
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td class="email-footer" style="background-color: #2d3748; color: #cbd5e0; padding: 30px 30px; text-align: center; border-radius: 0 0 8px 8px;">
+                            
+                            <div class="email-footer-company" style="font-size: 14px; font-weight: 600; color: #ffffff; margin-bottom: 12px;">
+                                IT Support
+                            </div>
+                            
+                            <div class="email-footer-contact" style="font-size: 12px; color: #a0aec0; margin: 5px 0;">
+                                📞 
+                            </div>
+                            
+                            <div class="email-footer-contact" style="font-size: 12px; color: #a0aec0; margin: 5px 0;">
+                                ✉️ <a href="mailto:support@samix.one" style="color: #90cdf4; text-decoration: none;">support@samix.one</a>
+                            </div>
+                            
+                            <div class="email-footer-contact" style="font-size: 12px; color: #a0aec0; margin: 5px 0;">
+                                🌐 <a href="" style="color: #90cdf4; text-decoration: none;"></a>
+                            </div>
+                            
+                            <div class="email-footer-divider" style="height: 1px; background-color: #4a5568; margin: 20px 0;"></div>
+                            
+                            <div class="email-footer-legal" style="font-size: 11px; color: #718096; line-height: 1.5;">
+                                © 2025 IT Support. All rights reserved.
+                            </div>
+                            
+                        </td>
+                    </tr>
+                    
+                </table>
+                <!-- End Email Container -->
+            </td>
+        </tr>
+    </table>
+    <!-- End Wrapper -->
+</body>
+</html>

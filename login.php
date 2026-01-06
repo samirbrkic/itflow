@@ -99,6 +99,10 @@ $config_mail_from_name  = sanitizeInput($row['config_mail_from_name']);
 $config_client_portal_enable     = intval($row['config_client_portal_enable']);
 $config_login_remember_me_expire = intval($row['config_login_remember_me_expire']);
 
+// White label
+$config_whitelabel_enabled = intval($row['config_whitelabel_enabled']);
+
+
 // Login key (if setup)
 $config_login_key_required = $row['config_login_key_required'];
 $config_login_key_secret = $row['config_login_key_secret'];
@@ -589,7 +593,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
 <?php
 if (!$config_whitelabel_enabled) {
-    echo '<small class="text-muted">Powered by ITFlow</small>';
+    echo '<small class="text-muted">Powered by SamiXone</small>';
 }
 ?>
 
