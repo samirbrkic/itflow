@@ -14,7 +14,7 @@
         <!-- SEARCH FORM -->
         <form class="form-inline" action="/agent/global_search.php">
             <div class="input-group input-group-sm">
-                <input class="form-control form-control-navbar" type="search" placeholder="Search everywhere" name="query"
+                <input class="form-control form-control-navbar" type="search" placeholder="<?php echo __('search_everywhere', 'Search everywhere'); ?>" name="query"
                     value="<?php if (isset($_GET['query'])) { echo nullable_htmlentities($_GET['query']); } ?>">
                 <div class="input-group-append">
                     <button class="btn btn-navbar" type="submit">
@@ -102,10 +102,10 @@
                 <!-- Menu Footer-->
                 <li class="user-footer">
                     <?php if ($session_is_admin) { ?>
-                        <a href="/admin" class="btn btn-default btn-block btn-flat mb-2"><i class="fas fa-user-shield mr-2"></i>Administration</a>
+                        <a href="/admin" class="btn btn-default btn-block btn-flat mb-2"><i class="fas fa-user-shield mr-2"></i><?php echo __('administration', 'Administration'); ?></a>
                     <?php } ?>
-                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog mr-2"></i>Account</a>
-                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-right"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog mr-2"></i><?php echo __('account', 'Account'); ?></a>
+                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-right"><i class="fas fa-sign-out-alt mr-2"></i><?php echo __('logout', 'Logout'); ?></a>
                 </li>
             </ul>
         </li>
