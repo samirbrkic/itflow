@@ -602,7 +602,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
 <?php
 if (!$config_whitelabel_enabled) {
-    echo '<small class="text-muted">Powered by SamiXone</small>';
+    echo '<small class="text-muted">Powered by ITFlow</small>';
 }
 ?>
 
