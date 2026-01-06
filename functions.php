@@ -1,5 +1,11 @@
 <?php
 
+// Include i18n support
+require_once __DIR__ . "/includes/i18n.php";
+
+// Initialize i18n system (will be called after session is initialized)
+// i18n_init() is called in session_init.php or after user login
+
 // Role check failed wording
 DEFINE("WORDING_ROLECHECK_FAILED", "You are not permitted to do that!");
 

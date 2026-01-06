@@ -45,6 +45,10 @@ if ($config_https_only && (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'o
 // Set Timezone after session_start
 require_once "includes/inc_set_timezone.php";
 
+// Initialize i18n (internationalization) system
+require_once "includes/i18n.php";
+i18n_init();
+
 // IP & User Agent for logging
 $session_ip = sanitizeInput(getIP());
 $session_user_agent = sanitizeInput($_SERVER['HTTP_USER_AGENT'] ?? '');
@@ -99,6 +103,10 @@ $config_mail_from_name  = sanitizeInput($row['config_mail_from_name']);
 $config_client_portal_enable     = intval($row['config_client_portal_enable']);
 $config_login_remember_me_expire = intval($row['config_login_remember_me_expire']);
 
+// White label
+$config_whitelabel_enabled = intval($row['config_whitelabel_enabled']);
+
+
 // Login key (if setup)
 $config_login_key_required = $row['config_login_key_required'];
 $config_login_key_secret = $row['config_login_key_secret'];
@@ -124,7 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
         header("HTTP/1.1 401 Unauthorized");
         $response = "
           <div class='alert alert-danger'>
-            Incorrect username or password.
+            " . __('invalid_credentials', 'Incorrect username or password') . "
             <button class='close' data-dismiss='alert'>&times;</button>
           </div>";
     } else {
@@ -182,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
             $response = "
               <div class='alert alert-danger'>
-                Incorrect username or password.
+                " . __('invalid_credentials', 'Incorrect username or password') . "
                 <button class='close' data-dismiss='alert'>&times;</button>
               </div>";
 
@@ -200,8 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                 $show_role_choice = true;
                 $response = "
                     <div class='alert alert-info'>
-                        This login can be used as either an Agent account or a Client Portal account.
-                        Please choose how you want to continue.
+                        " . __('login_role_choice', 'This login can be used as either an Agent account or a Client Portal account. Please choose how you want to continue.') . "
                         <button class='close' data-dismiss='alert'>&times;</button>
                     </div>";
             }
@@ -473,7 +480,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?php echo nullable_htmlentities($company_name); ?> | Login</title>
+    <title><?php echo nullable_htmlentities($company_name); ?> | <?php echo __('login', 'Login'); ?></title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
@@ -493,6 +500,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 <body class="hold-transition login-page">
 
 <div class="login-box">
+    
+    <!-- Language Switcher -->
+    <div class="text-right mb-2">
+        <?php require_once "includes/language_switcher.php"; ?>
+    </div>
+
     <div class="login-logo">
         <?php if (!empty($company_logo)) { ?>
             <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
@@ -516,7 +529,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
                 <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?>>
                     <input type="text" class="form-control"
-                        placeholder="<?php if ($config_login_key_required) { if (!isset($_GET['key']) || $_GET['key'] !== $config_login_key_secret) { echo "Client "; } } echo "Email"; ?>"
+                        placeholder="<?php if ($config_login_key_required) { if (!isset($_GET['key']) || $_GET['key'] !== $config_login_key_secret) { echo __('client', 'Client') . ' '; } } echo __('email', 'Email'); ?>"
                         name="email"
                         value="<?php echo htmlspecialchars($email ?? '', ENT_QUOTES); ?>"
                         required <?php if (!isset($token_field) || !$token_field) { echo "autofocus"; } ?>
@@ -529,7 +542,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                 </div>
 
                 <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?>>
-                    <input type="password" class="form-control" placeholder="Password" name="password"
+                    <input type="password" class="form-control" placeholder="<?php echo __('password', 'Password'); ?>" name="password"
                            value="<?php echo isset($token_field) && $token_field ? htmlspecialchars($password ?? '', ENT_QUOTES) : ''; ?>"
                            required>
                     <div class="input-group-append">
@@ -548,7 +561,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                 <div class="form-group mb-3">
                     <div class="custom-control custom-checkbox">
                         <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                        <label class="custom-control-label" for="remember_me">Remember Me</label>
+                        <label class="custom-control-label" for="remember_me"><?php echo __('remember_me', 'Remember Me'); ?></label>
                     </div>
                 </div>
                 <?php } ?>
@@ -557,14 +570,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                     <!-- When both agent & client accounts exist with same email/password -->
                     <div class="mb-2 text-center">
                         <button type="submit" class="btn btn-primary btn-block mb-2" name="role_choice" value="agent">
-                            Log in as Agent
+                            <?php echo __('login_as_agent', 'Log in as Agent'); ?>
                         </button>
                         <button type="submit" class="btn btn-success btn-block" name="role_choice" value="client">
-                            Log in as Client
+                            <?php echo __('login_as_client', 'Log in as Client'); ?>
                         </button>
                     </div>
                 <?php else: ?>
-                    <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
+                    <button type="submit" class="btn btn-primary btn-block mb-3" name="login"><?php echo __('sign_in', 'Sign In'); ?></button>
                 <?php endif; ?>
 
             </form>
@@ -572,12 +585,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
             <?php if($config_client_portal_enable == 1){ ?>
                 <hr>
                 <?php if (!empty($config_smtp_host)) { ?>
-                    <a href="client/login_reset.php">Forgot password?</a>
+                    <a href="client/login_reset.php"><?php echo __('forgot_password', 'Forgot password?'); ?></a>
                 <?php } ?>
                 <?php if (!empty($azure_client_id)) { ?>
                     <div class="col text-center mt-2">
                         <a href="client/login_microsoft.php">
-                            <button type="button" class="btn btn-secondary">Login with Microsoft Entra</button>
+                            <button type="button" class="btn btn-secondary"><?php echo __('login_microsoft', 'Login with Microsoft Entra'); ?></button>
                         </a>
                     </div>
                 <?php } ?>
@@ -589,7 +602,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
 <?php
 if (!$config_whitelabel_enabled) {
-    echo '<small class="text-muted">Powered by ITFlow</small>';
+    echo '<small class="text-muted">Powered by SamiXone</small>';
 }
 ?>
 
