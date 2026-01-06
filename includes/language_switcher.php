@@ -37,13 +37,13 @@ if (isset($_GET['change_language']) && !empty($_GET['change_language'])) {
 
 <div class="dropdown d-inline-block">
     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="languageSwitcher" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fas fa-globe"></i> <?php echo $current_language_name; ?>
+        <i class="fas fa-globe"></i> <?php echo htmlspecialchars($current_language_name, ENT_QUOTES, 'UTF-8'); ?>
     </button>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="languageSwitcher">
         <?php foreach ($available_languages as $lang_code => $lang_name): ?>
             <a class="dropdown-item <?php echo $lang_code === $current_language ? 'active' : ''; ?>" 
                href="?change_language=<?php echo urlencode($lang_code); ?>">
-                <?php echo $lang_name; ?>
+                <?php echo htmlspecialchars($lang_name, ENT_QUOTES, 'UTF-8'); ?>
                 <?php if ($lang_code === $current_language): ?>
                     <i class="fas fa-check float-right mt-1"></i>
                 <?php endif; ?>

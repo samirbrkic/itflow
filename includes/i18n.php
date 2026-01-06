@@ -83,6 +83,12 @@ function i18n_init($locale = null) {
         $locale = 'en_US';
     }
     
+    // Validate locale format to prevent path traversal attacks
+    // Only allow alphanumeric characters and underscore (e.g., en_US, de_DE)
+    if (!preg_match('/^[a-zA-Z]{2}_[a-zA-Z]{2}$/', $locale)) {
+        $locale = 'en_US'; // Fallback to safe default
+    }
+    
     // Load all language module files from locale directory
     $lang_dir = __DIR__ . "/../lang/{$locale}/";
     
