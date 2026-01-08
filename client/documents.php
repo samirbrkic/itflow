@@ -18,15 +18,15 @@ $documents_sql = mysqli_query($mysqli, "SELECT document_id, document_name, docum
 
 <div class="row">
     <div class="col">
-        <h3><i class="fas fa-file-alt mr-2"></i>Documents</h3>
+        <h3><i class="fas fa-file-alt mr-2"></i><?php echo __('client_portal_documents', 'Documents'); ?></h3>
     </div>
     <div class="col-auto">
         <div class="btn-group">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadDocumentModal">
-                <i class="fas fa-plus mr-2"></i>New Document
+                <i class="fas fa-plus mr-2"></i><?php echo __('client_portal_document_name', 'New Document'); ?>
             </button>
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#uploadFileDocumentModal">
-                <i class="fas fa-upload mr-2"></i>Upload File
+                <i class="fas fa-upload mr-2"></i><?php echo __('client_portal_action_upload', 'Upload File'); ?>
             </button>
         </div>
     </div>
@@ -37,9 +37,9 @@ $documents_sql = mysqli_query($mysqli, "SELECT document_id, document_name, docum
         <table class="table table-bordered border border-dark">
             <thead class="thead-dark">
             <tr>
-                <th>Name</th>
-                <th>Created</th>
-                <th class="text-center">Actions</th>
+                <th><?php echo __('client_portal_document_name', 'Name'); ?></th>
+                <th><?php echo __('client_portal_ticket_created', 'Created'); ?></th>
+                <th class="text-center"><?php echo __('client_portal_action_view', 'Actions'); ?></th>
             </tr>
             </thead>
             <tbody>

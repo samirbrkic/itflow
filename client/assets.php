@@ -18,7 +18,7 @@ $assets_sql = mysqli_query($mysqli, "SELECT * FROM assets LEFT JOIN contacts ON 
 
     <div class="row">
         <div class="col">
-            <h3>Assets</h3>
+            <h3><?php echo __('client_portal_assets', 'Assets'); ?></h3>
         </div>
     </div>
 
@@ -29,14 +29,14 @@ $assets_sql = mysqli_query($mysqli, "SELECT * FROM assets LEFT JOIN contacts ON 
             <table class="table tabled-bordered border border-dark">
                 <thead class="thead-dark">
                 <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Model</th>
-                    <th>Serial</th>
-                    <th>Assigned</th>
-                    <th>Purchase</th>
-                    <th>Warranty</th>
-                    <th>Status</th>
+                    <th><?php echo __('client_portal_asset_name', 'Name'); ?></th>
+                    <th><?php echo __('client_portal_asset_type', 'Type'); ?></th>
+                    <th><?php echo __('client_portal_asset_model', 'Model'); ?></th>
+                    <th><?php echo __('client_portal_asset_serial', 'Serial'); ?></th>
+                    <th><?php echo __('client_portal_asset_assigned_to', 'Assigned'); ?></th>
+                    <th><?php echo __('client_portal_asset_install_date', 'Purchase'); ?></th>
+                    <th><?php echo __('client_portal_asset_warranty_expire', 'Warranty'); ?></th>
+                    <th><?php echo __('client_portal_ticket_status', 'Status'); ?></th>
                     <th>URI</th>
                 </tr>
                 </thead>

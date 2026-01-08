@@ -30,7 +30,7 @@ $payment_provider_threshold = floatval($row['payment_provider_threshold']);
 
 ?>
 
-<h3>Recurring Invoices</h3>
+<h3><?php echo __('client_portal_recurring_invoices', 'Recurring Invoices'); ?></h3>
 <div class="row">
 
     <div class="col-md-10">
@@ -38,10 +38,10 @@ $payment_provider_threshold = floatval($row['payment_provider_threshold']);
         <table class="table tabled-bordered border border-dark">
             <thead class="thead-dark">
             <tr>
-                <th>Scope</th>
-                <th>Amount</th>
-                <th>Next Bill Date</th>
-                <th>Frequency</th>
+                <th><?php echo __('client_portal_ticket_subject', 'Scope'); ?></th>
+                <th><?php echo __('client_portal_recurring_invoice_amount', 'Amount'); ?></th>
+                <th><?php echo __('client_portal_recurring_invoice_next_date', 'Next Bill Date'); ?></th>
+                <th><?php echo __('client_portal_recurring_invoice_frequency', 'Frequency'); ?></th>
                 <?php if ($payment_provider_id) { ?>
                 <th>Auto Pay</th>
                 <?php } ?>
