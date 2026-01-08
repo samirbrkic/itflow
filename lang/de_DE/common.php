@@ -169,3 +169,23 @@ $lang['timezone'] = 'Zeitzone';
 $lang['currency'] = 'Währung';
 $lang['date_format'] = 'Datumsformat';
 $lang['time_format'] = 'Zeitformat';
+
+// Time Ago Translations
+$lang['time_right_now'] = 'gerade eben';
+$lang['time_years'] = 'Jahren';
+$lang['time_year'] = 'Jahr';
+$lang['time_months'] = 'Monaten';
+$lang['time_month'] = 'Monat';
+$lang['time_weeks'] = 'Wochen';
+$lang['time_week'] = 'Woche';
+$lang['time_days'] = 'Tagen';
+$lang['time_day'] = 'Tag';
+$lang['time_hours'] = 'Stunden';
+$lang['time_hour'] = 'Stunde';
+$lang['time_minutes'] = 'Minuten';
+$lang['time_minute'] = 'Minute';
+$lang['time_seconds'] = 'Sekunden';
+$lang['time_second'] = 'Sekunde';
+$lang['time_ago_prefix'] = 'vor';
+$lang['time_ago_suffix'] = '';
+$lang['time_in_future'] = 'in';

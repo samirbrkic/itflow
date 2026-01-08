@@ -11,12 +11,12 @@
 <br>
 
 <!-- Modern Footer -->
-<footer class="mt-5 py-4" style="background: linear-gradient(135deg, var(--gray-50), var(--gray-100)); border-top: 1px solid var(--gray-200);">
+<footer class="mt-5 py-4" style="background: var(--surface-2); border-top: 1px solid var(--border);">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
-                <p class="mb-2" style="font-weight: 600; color: var(--gray-800);">
-                    <i class="fas fa-building mr-2" style="color: var(--primary-color);"></i><?php echo nullable_htmlentities($session_company_name); ?>
+                <p class="mb-2 font-weight-semibold">
+                    <i class="fas fa-building mr-2 text-primary"></i><?php echo nullable_htmlentities($session_company_name); ?>
                 </p>
                 <div class="footer-links">
                     <a href="https://samix.one/legal/imprint" target="_blank" rel="noopener noreferrer" class="footer-link">
@@ -32,7 +32,7 @@
             </div>
             <div class="col-md-6 text-center text-md-right">
                 <small class="text-muted">
-                    <i class="fas fa-shield-alt mr-1" style="color: var(--success-color);"></i>Secure Portal
+                    <i class="fas fa-shield-alt mr-1 text-success"></i>Secure Portal
                     <span class="mx-2">•</span>
                     <i class="fas fa-clock mr-1"></i><?php echo date('Y'); ?>
                 </small>
@@ -50,9 +50,15 @@
 <!-- Bootstrap 4 -->
 <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
+<!-- Pretty Content (for ticket details) -->
+<script src="/js/pretty_content.js"></script>
+
 <!--- TinyMCE -->
 <script src="/plugins/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
 <script src="/js/tinymce_init.js"></script>
+
+</body>
+</html>
 
 <script src="/js/pretty_content.js"></script>
 

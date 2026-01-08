@@ -496,29 +496,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
     <!-- Theme style -->
     <link rel="stylesheet" href="plugins/adminlte/css/adminlte.min.css">
 
-</head>
-<body class="hold-transition login-page">
+    <!-- ITFlow Custom Calm Design -->
+    <link rel="stylesheet" href="css/itflow_custom.css">
 
-<div class="login-box">
+</head>
+<body class="hold-transition login-page" style="background: var(--bg);">
+
+<div class="login-box" style="width: 420px; margin-top: 5vh;">
     
     <!-- Language Switcher -->
-    <div class="text-right mb-2">
+    <div class="text-right mb-3">
         <?php require_once "includes/language_switcher.php"; ?>
     </div>
 
-    <div class="login-logo">
+    <div class="login-logo mb-4">
         <?php if (!empty($company_logo)) { ?>
-            <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>">
+            <img alt="<?=nullable_htmlentities($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?php echo "uploads/settings/$company_logo"; ?>" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));">
         <?php } else { ?>
-            <span class="text-primary text-bold"><i class="fas fa-paper-plane mr-2"></i>IT</span>Flow
+            <span style="font-size: 2rem; font-weight: 700; color: var(--text);"><i class="fas fa-paper-plane mr-2" style="color: var(--primary);"></i>IT<span style="color: var(--primary);">Flow</span></span>
         <?php } ?>
     </div>
 
-    <div class="card">
-        <div class="card-body login-card-body">
+    <div class="card" style="border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); background: var(--surface);">
+        <div class="card-body" style="padding: 2rem;">
 
             <?php if (!empty($config_login_message)){ ?>
-            <p class="login-box-msg px-0"><?php echo nl2br($config_login_message); ?></p>
+            <div class="mb-3 p-3" style="background: var(--surface-2); border-left: 3px solid var(--primary); border-radius: var(--radius-md);">
+                <p class="mb-0" style="color: var(--text-muted); font-size: 0.9rem;"><?php echo nl2br($config_login_message); ?></p>
+            </div>
             <?php } ?>
 
             <?php if (isset($response)) { ?>
@@ -527,26 +532,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
 
             <form method="post">
 
-                <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?>>
-                    <input type="text" class="form-control"
+                <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?> style="border-radius: var(--radius-md); overflow: hidden;">
+                    <input type="text" class="form-control" style="border: 1px solid var(--border); border-right: none; padding: 0.625rem 1rem; font-size: 0.95rem;"
                         placeholder="<?php if ($config_login_key_required) { if (!isset($_GET['key']) || $_GET['key'] !== $config_login_key_secret) { echo __('client', 'Client') . ' '; } } echo __('email', 'Email'); ?>"
                         name="email"
                         value="<?php echo htmlspecialchars($email ?? '', ENT_QUOTES); ?>"
                         required <?php if (!isset($token_field) || !$token_field) { echo "autofocus"; } ?>
                     >
                     <div class="input-group-append">
-                        <div class="input-group-text">
+                        <div class="input-group-text" style="background: var(--surface-2); border: 1px solid var(--border); border-left: none; color: var(--text-muted);">
                             <span class="fas fa-envelope"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?>>
-                    <input type="password" class="form-control" placeholder="<?php echo __('password', 'Password'); ?>" name="password"
+                <div class="input-group mb-3" <?php if (isset($token_field) && $token_field) { echo "hidden"; } ?> style="border-radius: var(--radius-md); overflow: hidden;">
+                    <input type="password" class="form-control" style="border: 1px solid var(--border); border-right: none; padding: 0.625rem 1rem; font-size: 0.95rem;" placeholder="<?php echo __('password', 'Password'); ?>" name="password"
                            value="<?php echo isset($token_field) && $token_field ? htmlspecialchars($password ?? '', ENT_QUOTES) : ''; ?>"
                            required>
                     <div class="input-group-append">
-                        <div class="input-group-text">
+                        <div class="input-group-text" style="background: var(--surface-2); border: 1px solid var(--border); border-left: none; color: var(--text-muted);">
                             <span class="fas fa-lock"></span>
                         </div>
                     </div>
@@ -569,31 +574,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                 <?php if ($show_role_choice): ?>
                     <!-- When both agent & client accounts exist with same email/password -->
                     <div class="mb-2 text-center">
-                        <button type="submit" class="btn btn-primary btn-block mb-2" name="role_choice" value="agent">
-                            <?php echo __('login_as_agent', 'Log in as Agent'); ?>
+                        <button type="submit" class="btn btn-primary btn-block mb-2" style="padding: 0.625rem 1.25rem; font-weight: 600; box-shadow: var(--shadow-soft);" name="role_choice" value="agent">
+                            <i class="fas fa-user-tie mr-2"></i><?php echo __('login_as_agent', 'Log in as Agent'); ?>
                         </button>
-                        <button type="submit" class="btn btn-success btn-block" name="role_choice" value="client">
-                            <?php echo __('login_as_client', 'Log in as Client'); ?>
+                        <button type="submit" class="btn btn-success btn-block" style="padding: 0.625rem 1.25rem; font-weight: 600; box-shadow: var(--shadow-soft);" name="role_choice" value="client">
+                            <i class="fas fa-user mr-2"></i><?php echo __('login_as_client', 'Log in as Client'); ?>
                         </button>
                     </div>
                 <?php else: ?>
-                    <button type="submit" class="btn btn-primary btn-block mb-3" name="login"><?php echo __('sign_in', 'Sign In'); ?></button>
+                    <button type="submit" class="btn btn-primary btn-block mb-3" style="padding: 0.625rem 1.25rem; font-weight: 600; box-shadow: var(--shadow-soft);" name="login">
+                        <i class="fas fa-sign-in-alt mr-2"></i><?php echo __('sign_in', 'Sign In'); ?>
+                    </button>
                 <?php endif; ?>
 
             </form>
 
             <?php if($config_client_portal_enable == 1){ ?>
-                <hr>
-                <?php if (!empty($config_smtp_host)) { ?>
-                    <a href="client/login_reset.php"><?php echo __('forgot_password', 'Forgot password?'); ?></a>
-                <?php } ?>
-                <?php if (!empty($azure_client_id)) { ?>
-                    <div class="col text-center mt-2">
-                        <a href="client/login_microsoft.php">
-                            <button type="button" class="btn btn-secondary"><?php echo __('login_microsoft', 'Login with Microsoft Entra'); ?></button>
+                <hr style="border-color: var(--border); margin: 1.5rem 0;">
+                <div class="text-center">
+                    <?php if (!empty($config_smtp_host)) { ?>
+                        <a href="client/login_reset.php" style="color: var(--primary); font-weight: 500; text-decoration: none;">
+                            <i class="fas fa-key mr-1"></i><?php echo __('forgot_password', 'Forgot password?'); ?>
                         </a>
-                    </div>
-                <?php } ?>
+                    <?php } ?>
+                    <?php if (!empty($azure_client_id)) { ?>
+                        <div class="mt-3">
+                            <a href="client/login_microsoft.php">
+                                <button type="button" class="btn btn-outline-secondary" style="font-weight: 500;">
+                                    <i class="fab fa-microsoft mr-2"></i><?php echo __('login_microsoft', 'Login with Microsoft Entra'); ?>
+                                </button>
+                            </a>
+                        </div>
+                    <?php } ?>
+                </div>
             <?php } ?>
 
         </div>

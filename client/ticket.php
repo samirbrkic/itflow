@@ -40,8 +40,15 @@ if (isset($_GET['id']) && intval($_GET['id'])) {
 
         $ticket_prefix = nullable_htmlentities($ticket_row['ticket_prefix']);
         $ticket_number = intval($ticket_row['ticket_number']);
-        $ticket_status = nullable_htmlentities($ticket_row['ticket_status_name']);
-        $ticket_priority = nullable_htmlentities($ticket_row['ticket_priority']);
+        $ticket_status_raw = nullable_htmlentities($ticket_row['ticket_status_name']);
+        $ticket_priority_raw = nullable_htmlentities($ticket_row['ticket_priority']);
+        
+        // Translate status name (i18n-compliant)
+        $ticket_status = __('ticket_status_' . strtolower(str_replace(' ', '_', $ticket_status_raw)), $ticket_status_raw);
+        
+        // Translate priority (i18n-compliant)
+        $ticket_priority = __('client_portal_priority_' . strtolower($ticket_priority_raw), $ticket_priority_raw);
+        
         $ticket_subject = nullable_htmlentities($ticket_row['ticket_subject']);
         $ticket_details = $purifier->purify($ticket_row['ticket_details']);
         $ticket_assigned_to = nullable_htmlentities($ticket_row['user_name']);
@@ -83,42 +90,65 @@ if (isset($_GET['id']) && intval($_GET['id'])) {
         </ol>
 
         <div class="card">
-            <div class="card-header bg-dark my-2">
-                <h4 class="card-title mt-1">
-                    <?php echo __('client_portal_ticket_number', 'Ticket'); ?> <?php echo $ticket_prefix, $ticket_number ?>
-                </h4>
-                <div class="card-tools">
-                    <?php
-                    if (empty($ticket_resolved_at) && $task_count == $completed_task_count) { ?>
-                        <a href="post.php?resolve_ticket=<?php echo $ticket_id; ?>" class="btn btn-sm btn-outline-success float-right text-white confirm-link"><i class="fas fa-fw fa-check text-success"></i> <?php echo __('client_portal_ticket_resolved', 'Resolve ticket'); ?></a>
-                    <?php } ?>
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-ticket-alt mr-2 text-primary"></i>
+                        <?php echo __('client_portal_ticket_number', 'Ticket'); ?> <?php echo $ticket_prefix, $ticket_number ?>
+                        <span class="badge <?php echo getStatusBadgeClass($ticket_status); ?> ml-2"><?php echo $ticket_status; ?></span>
+                    </h4>
+                    <div class="card-tools">
+                        <?php
+                        if (empty($ticket_resolved_at) && $task_count == $completed_task_count) { ?>
+                            <a href="post.php?resolve_ticket=<?php echo $ticket_id; ?>" class="btn btn-sm btn-success confirm-link"><i class="fas fa-fw fa-check mr-1"></i> <?php echo __('client_portal_ticket_mark_resolved', 'Als gelöst markieren'); ?></a>
+                        <?php } ?>
+                    </div>
                 </div>
             </div>
 
             <div class="card-body prettyContent">
-                <h5><strong><?php echo __('client_portal_ticket_subject', 'Subject'); ?>:</strong> <?php echo $ticket_subject ?></h5>
-                <p>
-                    <strong><?php echo __('client_portal_ticket_status', 'State'); ?>:</strong> <?php echo $ticket_status ?><br>
-                    <strong><?php echo __('client_portal_ticket_priority', 'Priority'); ?>:</strong> <?php echo $ticket_priority ?><br>
-                    <?php if (!empty($ticket_category)) { ?>
-                        <strong><?php echo __('client_portal_ticket_category', 'Category'); ?>:</strong> <?php echo $ticket_category ?><br>
-                    <?php } ?>
-
-                    <?php if (empty($ticket_closed_at)) { ?>
-
-                        <?php if ($task_count) { ?>
-                            <strong><?php echo __('client_portal_ticket_attachments', 'Tasks'); ?>: </strong> <?php echo $completed_task_count . " / " .$task_count ?>
-                            <br>
+                <div class="mb-3">
+                    <h5 class="mb-3"><i class="fas fa-comment-alt mr-2 text-primary"></i><strong><?php echo __('client_portal_ticket_subject', 'Subject'); ?>:</strong> <?php echo $ticket_subject ?></h5>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <strong><i class="fas fa-exclamation-circle mr-2 text-muted"></i><?php echo __('client_portal_ticket_priority', 'Priorität'); ?>:</strong> 
+                            <span class="badge badge-<?php 
+                                $priority_lower = strtolower($ticket_priority_raw);
+                                echo $priority_lower == 'high' || $priority_lower == 'hoch' || $priority_lower == 'critical' || $priority_lower == 'kritisch' ? 'danger' : 
+                                     ($priority_lower == 'medium' || $priority_lower == 'mittel' ? 'warning' : 'secondary'); 
+                            ?>"><?php echo $ticket_priority ?></span>
+                        </p>
+                        <?php if (!empty($ticket_category)) { ?>
+                            <p class="mb-2">
+                                <strong><i class="fas fa-folder mr-2 text-muted"></i><?php echo __('client_portal_ticket_category', 'Category'); ?>:</strong> <?php echo $ticket_category ?>
+                            </p>
                         <?php } ?>
-
-                        <?php if (!empty($ticket_assigned_to)) { ?>
-                            <strong><?php echo __('client_portal_ticket_assigned_to', 'Assigned to'); ?>: </strong> <?php echo $ticket_assigned_to ?>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <?php if (empty($ticket_closed_at)) { ?>
+                            <?php if ($task_count) { ?>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-tasks mr-2 text-muted"></i><?php echo __('client_portal_ticket_attachments', 'Tasks'); ?>:</strong> 
+                                    <span class="badge badge-primary"><?php echo $completed_task_count . " / " .$task_count ?></span>
+                                </p>
+                            <?php } ?>
+                            <?php if (!empty($ticket_assigned_to)) { ?>
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-user mr-2 text-muted"></i><?php echo __('client_portal_ticket_assigned_to', 'Assigned to'); ?>:</strong> <?php echo $ticket_assigned_to ?>
+                                </p>
+                            <?php } ?>
                         <?php } ?>
-
-                    <?php } ?>
-                </p>
+                    </div>
+                </div>
+                
                 <hr>
-                <?php echo $ticket_details ?>
+                <div class="ticket-content">
+                    <?php echo $ticket_details ?>
+                </div>
 
                 <?php
                 while ($ticket_attachment = mysqli_fetch_array($sql_ticket_attachments)) {
@@ -136,55 +166,68 @@ if (isset($_GET['id']) && intval($_GET['id'])) {
 
         <?php if (empty($ticket_resolved_at)) { ?>
             <!-- Reply -->
-
-            <form action="post.php" enctype="multipart/form-data" method="post">
-                <input type="hidden" name="ticket_id" value="<?php echo $ticket_id ?>">
-                <div class="form-group">
-                    <textarea class="form-control tinymce" name="comment" placeholder="Add comments.."></textarea>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-reply mr-2"></i><?php echo __('client_portal_ticket_reply', 'Reply'); ?></h5>
                 </div>
-                <div class="form-group">
-                    <input type="file" class="form-control-file" name="file[]" multiple id="fileInput" accept=".jpg, .jpeg, .gif, .png, .webp, .pdf, .txt, .md, .doc, .docx, .odt, .csv, .xls, .xlsx, .ods, .pptx, .odp, .zip, .tar, .gz, .xml, .msg, .json, .wav, .mp3, .ogg, .mov, .mp4, .av1, .ovpn">
+                <div class="card-body">
+                    <form action="post.php" enctype="multipart/form-data" method="post">
+                        <input type="hidden" name="ticket_id" value="<?php echo $ticket_id ?>">
+                        <div class="form-group">
+                            <label><?php echo __('client_portal_ticket_comment', 'Kommentar'); ?></label>
+                            <textarea class="form-control tinymce" name="comment" rows="5" placeholder="<?php echo __('client_portal_ticket_add_comment_placeholder', 'Kommentar hinzufügen...'); ?>"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-paperclip mr-2"></i><?php echo __('client_portal_ticket_attachments', 'Attachments'); ?></label>
+                            <input type="file" class="form-control-file" name="file[]" multiple id="fileInput" accept=".jpg, .jpeg, .gif, .png, .webp, .pdf, .txt, .md, .doc, .docx, .odt, .csv, .xls, .xlsx, .ods, .pptx, .odp, .zip, .tar, .gz, .xml, .msg, .json, .wav, .mp3, .ogg, .mov, .mp4, .av1, .ovpn">
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="add_ticket_comment">
+                            <i class="fas fa-paper-plane mr-2"></i><?php echo __('client_portal_ticket_reply', 'Reply'); ?>
+                        </button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary" name="add_ticket_comment"><?php echo __('client_portal_ticket_reply', 'Reply'); ?></button>
-            </form>
+            </div>
 
         <?php } elseif (empty($ticket_closed_at)) { ?>
             <!-- Re-open -->
-
-            <h4><?php echo __('client_portal_ticket_resolved', 'Your ticket has been resolved'); ?></h4>
-
-            <div class="col-6">
-                <div class="row">
-                    <div class="col">
-                        <a href="post.php?reopen_ticket=<?php echo $ticket_id; ?>" class="btn btn-secondary btn-lg"><i class="fas fa-fw fa-redo text-white"></i> <?php echo __('client_portal_ticket_reopen', 'Reopen ticket'); ?></a>
-                    </div>
-
-                    <div class="col">
-                        <a href="post.php?close_ticket=<?php echo $ticket_id; ?>" class="btn btn-success btn-lg confirm-link"><i class="fas fa-fw fa-gavel text-white"></i> <?php echo __('client_portal_ticket_close', 'Close ticket'); ?></a>
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <h4 class="mb-4"><i class="fas fa-check-circle text-success mr-2"></i><?php echo __('client_portal_ticket_resolved', 'Your ticket has been resolved'); ?></h4>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="post.php?reopen_ticket=<?php echo $ticket_id; ?>" class="btn btn-secondary btn-lg mr-3">
+                            <i class="fas fa-fw fa-redo mr-2"></i><?php echo __('client_portal_ticket_reopen', 'Reopen ticket'); ?>
+                        </a>
+                        <a href="post.php?close_ticket=<?php echo $ticket_id; ?>" class="btn btn-success btn-lg confirm-link">
+                            <i class="fas fa-fw fa-gavel mr-2"></i><?php echo __('client_portal_ticket_close', 'Close ticket'); ?>
+                        </a>
                     </div>
                 </div>
             </div>
-            <br>
 
         <?php } elseif (empty($ticket_feedback)) { ?>
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <h4 class="mb-4"><?php echo __('client_portal_ticket_rate', 'Ticket closed. Please rate your ticket'); ?></h4>
 
-            <h4>Ticket closed. Please rate your ticket</h4>
+                    <form action="post.php" method="post" class="d-inline">
+                        <input type="hidden" name="ticket_id" value="<?php echo $ticket_id ?>">
 
-            <form action="post.php" method="post">
-                <input type="hidden" name="ticket_id" value="<?php echo $ticket_id ?>">
+                        <button type="submit" class="btn btn-success btn-lg mr-3" name="add_ticket_feedback" value="Good">
+                            <i class="fas fa-smile mr-2"></i><?php echo __('client_portal_feedback_good', 'Gut'); ?>
+                        </button>
 
-                <button type="submit" class="btn btn-primary btn-lg" name="add_ticket_feedback" value="Good" onclick="this.form.submit()">
-                    <span class="fa fa-smile" aria-hidden="true"></span> Good
-                </button>
-
-                <button type="submit" class="btn btn-danger btn-lg" name="add_ticket_feedback" value="Bad" onclick="this.form.submit()">
-                    <span class="fa fa-frown" aria-hidden="true"></span> Bad
-                </button>
-            </form>
+                        <button type="submit" class="btn btn-danger btn-lg" name="add_ticket_feedback" value="Bad">
+                            <i class="fas fa-frown mr-2"></i><?php echo __('client_portal_feedback_bad', 'Schlecht'); ?>
+                        </button>
+                    </form>
+                </div>
+            </div>
 
         <?php } else { ?>
-
-            <h4>Rated <?php echo $ticket_feedback ?> -- Thanks for your feedback!</h4>
+            <div class="alert alert-success text-center">
+                <h4><i class="fas fa-star mr-2"></i><?php echo __('client_portal_ticket_rated', 'Rated'); ?> <?php echo $ticket_feedback ?> - <?php echo __('client_portal_ticket_thanks', 'Thanks for your feedback!'); ?></h4>
+            </div>
 
         <?php } ?>
 
@@ -272,8 +315,6 @@ if (isset($_GET['id']) && intval($_GET['id'])) {
         }
 
         ?>
-
-        <script src="../js/pretty_content.js"></script>
 
         <?php
     } else {

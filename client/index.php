@@ -8,47 +8,7 @@ header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-in
 
 require_once "includes/inc_all.php";
 
-// ========================================
-// BADGE COLOR HELPER FUNCTION (i18n-compliant)
-// ========================================
-
-function getStatusBadgeClass($status_name) {
-    $status_lower = strtolower($status_name);
-    
-    // Red: Open/New (Offen/Neu)
-    if (stripos($status_lower, 'open') !== false || stripos($status_lower, 'offen') !== false || 
-        stripos($status_lower, 'new') !== false || stripos($status_lower, 'neu') !== false) {
-        return 'badge-danger';
-    } 
-    // Blue: In Progress/Working/Assigned (In Bearbeitung/Zugewiesen)
-    elseif (stripos($status_lower, 'progress') !== false || stripos($status_lower, 'bearbeitung') !== false ||
-            stripos($status_lower, 'working') !== false || stripos($status_lower, 'arbeit') !== false ||
-            stripos($status_lower, 'assigned') !== false || stripos($status_lower, 'zugewiesen') !== false) {
-        return 'badge-primary';
-    } 
-    // Orange: Waiting/Hold/Pending (Wartend/Warten/Ausstehend)
-    elseif (stripos($status_lower, 'waiting') !== false || stripos($status_lower, 'wartend') !== false ||
-            stripos($status_lower, 'warten') !== false || stripos($status_lower, 'wartet') !== false ||
-            stripos($status_lower, 'hold') !== false || stripos($status_lower, 'angehalten') !== false ||
-            stripos($status_lower, 'pending') !== false || stripos($status_lower, 'ausstehend') !== false) {
-        return 'badge-warning';
-    } 
-    // Green: Resolved/Closed/Completed (Gelöst/Geschlossen/Abgeschlossen)
-    elseif (stripos($status_lower, 'resolved') !== false || stripos($status_lower, 'gelöst') !== false ||
-            stripos($status_lower, 'closed') !== false || stripos($status_lower, 'geschlossen') !== false ||
-            stripos($status_lower, 'completed') !== false || stripos($status_lower, 'abgeschlossen') !== false ||
-            stripos($status_lower, 'erledigt') !== false) {
-        return 'badge-success';
-    } 
-    // Gray: Cancelled (Abgebrochen/Storniert)
-    elseif (stripos($status_lower, 'cancelled') !== false || stripos($status_lower, 'canceled') !== false ||
-            stripos($status_lower, 'abgebrochen') !== false || stripos($status_lower, 'storniert') !== false) {
-        return 'badge-secondary';
-    }
-    
-    // Default
-    return 'badge-secondary';
-}
+// Badge helper function now in functions.php for reusability
 
 // ========================================
 // VIEW FILTER PARAMETER
@@ -162,11 +122,11 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
 <div class="row mb-4">
     <div class="col-md-8">
         <div class="d-flex align-items-center mb-3">
-            <div class="mr-3" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--accent-purple)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+            <div class="mr-3 dashboard-icon-box">
                 <i class="fas fa-chart-line fa-2x text-white"></i>
             </div>
             <div>
-                <h2 class="mb-0" style="font-weight: 700; color: var(--gray-800);"><?php echo __('client_portal_dashboard', 'Dashboard'); ?></h2>
+                <h2 class="mb-0 dashboard-title"><?php echo __('client_portal_dashboard', 'Dashboard'); ?></h2>
                 <p class="text-muted mb-0"><?php echo __('client_portal_welcome_overview', 'Willkommen zur Übersicht'); ?></p>
             </div>
         </div>
@@ -195,15 +155,15 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
 <!-- Ticket Statistics Cards -->
 <div class="row mb-4">
     <div class="col-md-3">
-        <div class="card shadow-soft" style="border-left: 4px solid var(--danger-color);">
+        <div class="card stat-card-danger">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_open_tickets', 'Offen'); ?></h6>
-                        <h2 class="mb-0" style="font-weight: 700; color: var(--danger-color);"><?php echo $view_filter == 'my' ? $my_open_tickets : $total_open_tickets; ?></h2>
+                        <h6 class="stat-label mb-2"><?php echo __('client_portal_open_tickets', 'Offen'); ?></h6>
+                        <h2 class="stat-value stat-value-danger"><?php echo $view_filter == 'my' ? $my_open_tickets : $total_open_tickets; ?></h2>
                     </div>
-                    <div style="width: 50px; height: 50px; background: var(--danger-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-folder-open fa-lg" style="color: var(--danger-color);"></i>
+                    <div class="icon-box icon-box-danger">
+                        <i class="fas fa-folder-open fa-lg"></i>
                     </div>
                 </div>
             </div>
@@ -211,15 +171,15 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-soft" style="border-left: 4px solid var(--primary-color);">
+        <div class="card stat-card-primary">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_in_progress', 'In Bearbeitung'); ?></h6>
-                        <h2 class="mb-0" style="font-weight: 700; color: var(--primary-color);"><?php echo $total_in_progress; ?></h2>
+                        <h6 class="stat-label mb-2"><?php echo __('client_portal_in_progress', 'In Bearbeitung'); ?></h6>
+                        <h2 class="stat-value stat-value-primary"><?php echo $total_in_progress; ?></h2>
                     </div>
-                    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-spinner fa-lg" style="color: var(--primary-color);"></i>
+                    <div class="icon-box icon-box-primary">
+                        <i class="fas fa-spinner fa-lg"></i>
                     </div>
                 </div>
             </div>
@@ -227,15 +187,15 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-soft" style="border-left: 4px solid var(--success-color);">
+        <div class="card stat-card-success">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_resolved_today', 'Heute gelöst'); ?></h6>
-                        <h2 class="mb-0" style="font-weight: 700; color: var(--success-color);"><?php echo $total_resolved_today; ?></h2>
+                        <h6 class="stat-label mb-2"><?php echo __('client_portal_resolved_today', 'Heute gelöst'); ?></h6>
+                        <h2 class="stat-value stat-value-success"><?php echo $total_resolved_today; ?></h2>
                     </div>
-                    <div style="width: 50px; height: 50px; background: var(--success-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-check-circle fa-lg" style="color: var(--success-color);"></i>
+                    <div class="icon-box icon-box-success">
+                        <i class="fas fa-check-circle fa-lg"></i>
                     </div>
                 </div>
             </div>
@@ -243,15 +203,15 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-soft" style="border-left: 4px solid var(--gray-600);">
+        <div class="card stat-card-neutral">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_total_tickets', 'Gesamt'); ?></h6>
-                        <h2 class="mb-0" style="font-weight: 700; color: var(--gray-700);"><?php echo $view_filter == 'my' ? $my_total_tickets : $total_tickets_company; ?></h2>
+                        <h6 class="stat-label mb-2"><?php echo __('client_portal_total_tickets', 'Gesamt'); ?></h6>
+                        <h2 class="stat-value stat-value-neutral"><?php echo $view_filter == 'my' ? $my_total_tickets : $total_tickets_company; ?></h2>
                     </div>
-                    <div style="width: 50px; height: 50px; background: var(--gray-100); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
-                        <i class="fas fa-list fa-lg" style="color: var(--gray-600);"></i>
+                    <div class="icon-box icon-box-neutral">
+                        <i class="fas fa-list fa-lg"></i>
                     </div>
                 </div>
             </div>
@@ -265,7 +225,7 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
     <!-- Left Column: Recent Ticket Updates -->
     <div class="col-md-8 mb-4">
         <div class="card shadow-soft">
-            <div class="card-header" style="background: white; border-bottom: 2px solid var(--gray-100);">
+            <div class="card-header" style="background: var(--surface-2); border-bottom: 1px solid var(--border);">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="mb-0" style="font-weight: 600; color: var(--gray-800);">
                         <i class="fas fa-clock mr-2" style="color: var(--primary-color);"></i>
@@ -313,7 +273,7 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
                                     <small class="text-muted">
                                         <i class="fas fa-user mr-1"></i><?php echo $ticket_contact_name; ?>
                                         <span class="mx-2">•</span>
-                                        <i class="fas fa-clock mr-1"></i>Aktualisiert <?php echo $time_ago; ?>
+                                        <i class="fas fa-clock mr-1"></i><?php echo __('client_portal_updated', 'Aktualisiert'); ?> <?php echo $time_ago; ?>
                                     </small>
                                 </div>
                             </div>
@@ -333,46 +293,8 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
         </div>
     </div>
 
-    <!-- Right Column: Support Contact & Quick Links -->
+    <!-- Right Column: Quick Links -->
     <div class="col-md-4">
-        
-        <!-- Support Contact Card -->
-        <div class="card shadow-soft mb-4" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-purple));">
-            <div class="card-body text-white">
-                <h5 class="mb-3" style="font-weight: 600;">
-                    <i class="fas fa-headset mr-2"></i><?php echo __('client_portal_support_contact', 'Support kontaktieren'); ?>
-                </h5>
-                <div class="mb-3">
-                    <?php if (!empty($support_company_phone)) { ?>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-phone-alt mr-2" style="width: 20px;"></i>
-                        <a href="tel:<?php echo $support_company_phone; ?>" style="color: white; text-decoration: none; font-weight: 500;">
-                            <?php echo $support_company_phone; ?>
-                        </a>
-                    </div>
-                    <?php } ?>
-                    <?php if (!empty($support_company_email)) { ?>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-envelope mr-2" style="width: 20px;"></i>
-                        <a href="mailto:<?php echo $support_company_email; ?>" style="color: white; text-decoration: none; font-weight: 500;">
-                            <?php echo $support_company_email; ?>
-                        </a>
-                    </div>
-                    <?php } ?>
-                    <?php if (!empty($support_company_website)) { ?>
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-globe mr-2" style="width: 20px;"></i>
-                        <a href="<?php echo $support_company_website; ?>" target="_blank" style="color: white; text-decoration: none; font-weight: 500;">
-                            Website
-                        </a>
-                    </div>
-                    <?php } ?>
-                </div>
-                <div class="pt-3" style="border-top: 1px solid rgba(255,255,255,0.2);">
-                    <small><i class="fas fa-clock mr-2"></i><?php echo __('client_portal_support_hours', 'Mo-Fr 8-18 Uhr'); ?></small>
-                </div>
-            </div>
-        </div>
 
         <!-- Quick Links Card -->
         <div class="card shadow-soft">

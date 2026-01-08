@@ -142,7 +142,7 @@ header("X-Frame-Options: DENY"); // Legacy
 
             <?php } else { ?>
                 <span class="fa-stack fa-3x">
-                    <i class="fa fa-circle fa-stack-2x" style="color: var(--primary-color);"></i>
+                    <i class="fa fa-circle fa-stack-2x text-primary"></i>
                     <span class="fa fa-stack-1x text-white" style="font-weight: 700;"><?php echo $session_contact_initials; ?></span>
                 </span>
             <?php } ?>
@@ -152,7 +152,7 @@ header("X-Frame-Options: DENY"); // Legacy
                 <?php if ($session_company_logo) { ?>
                     <img height="48" width="142" class="img-fluid float-right" src="<?php echo "/uploads/settings/$session_company_logo"; ?>" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                 <?php } ?>
-            <h3 class="mb-1"><span class="text-gradient"><?php echo __('client_portal_welcome', 'Welcome'); ?></span>, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h3>
+            <h3 class="mb-1"><span class="text-primary"><?php echo __('client_portal_welcome', 'Welcome'); ?></span>, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h3>
             <p class="text-muted mb-0"><i class="fas fa-building mr-2"></i><?php echo nullable_htmlentities($session_client_name); ?></p>
         </div>
     </div>

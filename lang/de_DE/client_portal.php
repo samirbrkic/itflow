@@ -75,6 +75,14 @@ $lang['client_portal_ticket_new'] = 'Neu';
 $lang['client_portal_ticket_open'] = 'Offen';
 $lang['client_portal_ticket_on_hold'] = 'In Wartestellung';
 $lang['client_portal_ticket_resolved'] = 'Gelöst';
+$lang['client_portal_ticket_mark_resolved'] = 'Als gelöst markieren';
+$lang['client_portal_ticket_comment'] = 'Kommentar';
+$lang['client_portal_ticket_add_comment_placeholder'] = 'Kommentar hinzufügen...';
+$lang['client_portal_ticket_rate'] = 'Ticket geschlossen. Bitte bewerten Sie Ihr Ticket';
+$lang['client_portal_ticket_rated'] = 'Bewertet';
+$lang['client_portal_ticket_thanks'] = 'Vielen Dank für Ihr Feedback!';
+$lang['client_portal_feedback_good'] = 'Gut';
+$lang['client_portal_feedback_bad'] = 'Schlecht';
 
 // Invoices
 $lang['client_portal_invoice_number'] = 'Rechnung';

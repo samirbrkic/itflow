@@ -11,32 +11,7 @@ $ajax_mode = isset($_GET['ajax']) && $_GET['ajax'] == '1';
 
 require_once "includes/inc_all.php";
 
-// Badge color helper function (same as index.php)
-function getStatusBadgeClass($status_name) {
-    $status_lower = strtolower($status_name);
-    if (stripos($status_lower, 'open') !== false || stripos($status_lower, 'offen') !== false || 
-        stripos($status_lower, 'new') !== false || stripos($status_lower, 'neu') !== false) {
-        return 'badge-danger';
-    } elseif (stripos($status_lower, 'progress') !== false || stripos($status_lower, 'bearbeitung') !== false ||
-            stripos($status_lower, 'working') !== false || stripos($status_lower, 'arbeit') !== false ||
-            stripos($status_lower, 'assigned') !== false || stripos($status_lower, 'zugewiesen') !== false) {
-        return 'badge-primary';
-    } elseif (stripos($status_lower, 'waiting') !== false || stripos($status_lower, 'wartend') !== false ||
-            stripos($status_lower, 'warten') !== false || stripos($status_lower, 'wartet') !== false ||
-            stripos($status_lower, 'hold') !== false || stripos($status_lower, 'angehalten') !== false ||
-            stripos($status_lower, 'pending') !== false || stripos($status_lower, 'ausstehend') !== false) {
-        return 'badge-warning';
-    } elseif (stripos($status_lower, 'resolved') !== false || stripos($status_lower, 'gelöst') !== false ||
-            stripos($status_lower, 'closed') !== false || stripos($status_lower, 'geschlossen') !== false ||
-            stripos($status_lower, 'completed') !== false || stripos($status_lower, 'abgeschlossen') !== false ||
-            stripos($status_lower, 'erledigt') !== false) {
-        return 'badge-success';
-    } elseif (stripos($status_lower, 'cancelled') !== false || stripos($status_lower, 'canceled') !== false ||
-            stripos($status_lower, 'abgebrochen') !== false || stripos($status_lower, 'storniert') !== false) {
-        return 'badge-secondary';
-    }
-    return 'badge-secondary';
-}
+// Badge color helper function now in functions.php for reusability
 
 // ========================================
 // PAGINATION & SEARCH PARAMETERS
@@ -359,33 +334,37 @@ function buildQueryString($exclude = []) {
     <!-- Sidebar -->
     <div class="col-md-2">
 
-        <a href="ticket_add.php" class="btn btn-primary btn-block btn-lg mb-3 shadow-soft">
+        <a href="ticket_add.php" class="btn btn-primary btn-block mb-3 shadow-soft">
             <i class="fas fa-plus-circle mr-2"></i><?php echo __('client_portal_new_ticket', 'New ticket'); ?>
         </a>
 
-        <hr style="border-color: var(--gray-200);">
+        <hr style="border-color: var(--gray-300); margin: 1rem 0;">
 
-        <a href="?status=Open<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-danger btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
-            <i class="fas fa-folder-open mr-2"></i><?php echo __('client_portal_ticket_open', 'My Open tickets'); ?>
-            <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets_open ?></div>
-        </a>
+        <div class="d-flex flex-column align-items-stretch">
+            <a href="?status=Open<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-outline-danger mb-2 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-folder-open mr-2"></i><?php echo __('client_portal_ticket_open', 'Offen'); ?></span>
+                <span class="badge badge-danger ml-2"><?php echo $total_tickets_open ?></span>
+            </a>
 
-        <a href="?status=Closed<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-success btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
-            <i class="fas fa-check-circle mr-2"></i><?php echo __('client_portal_ticket_closed', 'Closed tickets'); ?>
-            <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets_closed ?></div>
-        </a>
+            <a href="?status=Closed<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-outline-success mb-2 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-check-circle mr-2"></i><?php echo __('client_portal_ticket_closed', 'Geschlossen'); ?></span>
+                <span class="badge badge-success ml-2"><?php echo $total_tickets_closed ?></span>
+            </a>
 
-        <a href="?status=%<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-secondary btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
-            <i class="fas fa-list mr-2"></i><?php echo __('client_portal_tickets', 'All my tickets'); ?>
-            <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets ?></div>
-        </a>
+            <a href="?status=%<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-outline-secondary mb-2 d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-list mr-2"></i><?php echo __('client_portal_tickets', 'Alle'); ?></span>
+                <span class="badge badge-secondary ml-2"><?php echo $total_tickets ?></span>
+            </a>
+        </div>
         
         <?php if ($session_contact_primary == 1 || $session_contact_is_technical_contact) { ?>
-        <hr style="border-color: var(--gray-200);">
+        <hr style="border-color: var(--gray-300); margin: 1rem 0;">
 
-        <a href="ticket_view_all.php" class="btn btn-dark btn-block p-2 mb-3 shadow-soft" style="border-radius: var(--radius-lg);">
-            <i class="fas fa-globe mr-2"></i><?php echo __('client_portal_all_tickets', 'All Tickets'); ?>
-        </a>
+        <div class="d-flex flex-column align-items-stretch">
+            <a href="ticket_view_all.php" class="btn btn-outline-primary mb-2">
+                <i class="fas fa-globe mr-2"></i><?php echo __('client_portal_all_tickets', 'Firmen-Tickets'); ?>
+            </a>
+        </div>
         <?php } ?>
 
     </div>

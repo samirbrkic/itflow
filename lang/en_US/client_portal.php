@@ -29,6 +29,23 @@ $lang['client_portal_title'] = 'Client Portal';
 
 // Welcome Section
 $lang['client_portal_welcome'] = 'Welcome';
+$lang['client_portal_welcome_overview'] = 'Welcome to the overview';
+
+// View Filter
+$lang['client_portal_all_company_tickets'] = 'All Company Tickets';
+$lang['client_portal_my_tickets'] = 'My Tickets';
+
+// Ticket Statistics
+$lang['client_portal_open_tickets'] = 'Open';
+$lang['client_portal_in_progress'] = 'In Progress';
+$lang['client_portal_resolved_today'] = 'Resolved Today';
+$lang['client_portal_total_tickets'] = 'Total';
+
+// Dashboard Sections
+$lang['client_portal_recent_updates'] = 'Recent Ticket Updates';
+$lang['client_portal_quick_links'] = 'Quick Access';
+$lang['client_portal_view_all'] = 'View all';
+$lang['client_portal_no_tickets'] = 'No ticket updates found';
 
 // Buttons
 $lang['client_portal_new_ticket'] = 'New ticket';
@@ -235,4 +252,4 @@ $lang['client_portal_loading'] = 'Loading...';
 $lang['client_portal_no_results'] = 'No results found';
 $lang['client_portal_showing'] = 'Showing';
 $lang['client_portal_of'] = 'of';
-$lang['client_portal_entries'] = 'entries';
+$lang['client_portal_entries'] = 'entries';$lang['client_portal_updated'] = 'Updated';

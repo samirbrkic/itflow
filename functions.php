@@ -872,28 +872,53 @@ function timeAgo($datetime)
     $difference = $time - time(); // Changed to handle future dates
 
     if ($difference == 0) {
-        return 'right now';
+        return __('time_right_now', 'gerade eben');
     }
 
     $isFuture = $difference > 0; // Check if the date is in the future
     $difference = abs($difference); // Absolute value for calculation
 
     $timeRules = array(
-        31536000 => 'year',
-        2592000 => 'month',
-        604800 => 'week',
-        86400 => 'day',
-        3600 => 'hour',
-        60 => 'minute',
-        1 => 'second'
+        31536000 => array('year', 'Jahren', 'Jahr'),
+        2592000 => array('month', 'Monaten', 'Monat'),
+        604800 => array('week', 'Wochen', 'Woche'),
+        86400 => array('day', 'Tagen', 'Tag'),
+        3600 => array('hour', 'Stunden', 'Stunde'),
+        60 => array('minute', 'Minuten', 'Minute'),
+        1 => array('second', 'Sekunden', 'Sekunde')
     );
 
-    foreach ($timeRules as $secs => $str) {
+    foreach ($timeRules as $secs => $labels) {
         $div = $difference / $secs;
         if ($div >= 1) {
             $t = round($div);
-            $timeStr = $t . ' ' . $str . ($t > 1 ? 's' : '');
-            return $isFuture ? 'in ' . $timeStr : $timeStr . ' ago';
+            
+            // Get the English label (for translation key)
+            $englishLabel = $labels[0];
+            
+            // Get German translation
+            $germanLabel = $t > 1 ? $labels[1] : $labels[2]; // plural : singular
+            
+            // Try to translate using i18n system
+            $translatedLabel = __('time_' . $englishLabel . ($t > 1 ? 's' : ''), $germanLabel);
+            
+            $timeStr = $t . ' ' . $translatedLabel;
+            
+            if ($isFuture) {
+                $prefix = __('time_in_future', 'in');
+                return $prefix . ' ' . $timeStr;
+            } else {
+                // For English: "" + "4 hours" + " ago" = "4 hours ago"
+                // For German: "vor " + "4 Stunden" + "" = "vor 4 Stunden"
+                $prefix = __('time_ago_prefix', 'vor');
+                $suffix = __('time_ago_suffix', '');
+                
+                if (!empty($prefix)) {
+                    return $prefix . ' ' . $timeStr;
+                } else {
+                    return $timeStr . ($suffix ? ' ' . $suffix : '');
+                }
+            }
         }
     }
 }
@@ -2024,4 +2049,49 @@ function dbCommit(mysqli $mysqli): void
 function dbRollback(mysqli $mysqli): void
 {
     $mysqli->rollback();
+}
+
+/**
+ * Get Bootstrap badge class based on ticket status name
+ * Supports both English and German status names
+ * 
+ * @param string $status_name The ticket status name
+ * @return string Bootstrap badge class (badge-danger, badge-primary, etc.)
+ */
+function getStatusBadgeClass($status_name) {
+    $status_lower = strtolower($status_name);
+    
+    // Red: Open/New (Offen/Neu)
+    if (stripos($status_lower, 'open') !== false || stripos($status_lower, 'offen') !== false || 
+        stripos($status_lower, 'new') !== false || stripos($status_lower, 'neu') !== false) {
+        return 'badge-danger';
+    } 
+    // Blue: In Progress/Working/Assigned (In Bearbeitung/Zugewiesen)
+    elseif (stripos($status_lower, 'progress') !== false || stripos($status_lower, 'bearbeitung') !== false ||
+            stripos($status_lower, 'working') !== false || stripos($status_lower, 'arbeit') !== false ||
+            stripos($status_lower, 'assigned') !== false || stripos($status_lower, 'zugewiesen') !== false) {
+        return 'badge-primary';
+    } 
+    // Orange: Waiting/Hold/Pending (Wartend/Warten/Ausstehend)
+    elseif (stripos($status_lower, 'waiting') !== false || stripos($status_lower, 'wartend') !== false ||
+            stripos($status_lower, 'warten') !== false || stripos($status_lower, 'wartet') !== false ||
+            stripos($status_lower, 'hold') !== false || stripos($status_lower, 'angehalten') !== false ||
+            stripos($status_lower, 'pending') !== false || stripos($status_lower, 'ausstehend') !== false) {
+        return 'badge-warning';
+    } 
+    // Green: Resolved/Closed/Completed (Gelöst/Geschlossen/Abgeschlossen)
+    elseif (stripos($status_lower, 'resolved') !== false || stripos($status_lower, 'gelöst') !== false ||
+            stripos($status_lower, 'closed') !== false || stripos($status_lower, 'geschlossen') !== false ||
+            stripos($status_lower, 'completed') !== false || stripos($status_lower, 'abgeschlossen') !== false ||
+            stripos($status_lower, 'erledigt') !== false) {
+        return 'badge-success';
+    } 
+    // Gray: Cancelled (Abgebrochen/Storniert)
+    elseif (stripos($status_lower, 'cancelled') !== false || stripos($status_lower, 'canceled') !== false ||
+            stripos($status_lower, 'abgebrochen') !== false || stripos($status_lower, 'storniert') !== false) {
+        return 'badge-secondary';
+    }
+    
+    // Default
+    return 'badge-secondary';
 }
