@@ -336,6 +336,34 @@ function getEmailTranslations($template_type, $lang = 'en') {
                 'contact_support' => 'Benötigen Sie Hilfe? Kontaktieren Sie unser Support-Team.',
                 'reply_instruction' => '<i style="color: #808080">##- Please type your reply above this line -##</i>'
             ]
+        ],
+        'watcher_added' => [
+            'en' => [
+                'title' => 'Added as Collaborator',
+                'greeting' => 'Hello',
+                'intro' => 'You have been added as a collaborator on the following support ticket. You will now receive all updates and can reply to this ticket.',
+                'ticket_details_title' => 'Ticket Details',
+                'ticket_label' => 'Ticket',
+                'subject_label' => 'Subject',
+                'status_label' => 'Status',
+                'original_request_label' => 'Original Request',
+                'view_button' => 'View Ticket',
+                'footer_text' => 'You are receiving this email because you were added as a collaborator on this ticket.',
+                'reply_instruction' => '<i style="color: #808080">##- Please type your reply above this line -##</i>'
+            ],
+            'de' => [
+                'title' => 'Als Mitarbeiter hinzugefügt',
+                'greeting' => 'Hallo',
+                'intro' => 'Sie wurden als Mitarbeiter zu folgendem Support-Ticket hinzugefügt. Sie erhalten nun alle Updates und können auf dieses Ticket antworten.',
+                'ticket_details_title' => 'Ticket-Details',
+                'ticket_label' => 'Ticket',
+                'subject_label' => 'Betreff',
+                'status_label' => 'Status',
+                'original_request_label' => 'Ursprüngliche Anfrage',
+                'view_button' => 'Ticket anzeigen',
+                'footer_text' => 'Sie erhalten diese E-Mail, weil Sie als Mitarbeiter zu diesem Ticket hinzugefügt wurden.',
+                'reply_instruction' => '<i style="color: #808080">##- Please type your reply above this line -##</i>'
+            ]
         ]
     ];
     

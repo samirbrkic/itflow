@@ -1,2 +1,5 @@
-# Prevent access to .git, .github, and config.php
-RedirectMatch 404 ^/(\.git|\.github|config\.php)
+# Prevent access to sensitive files and folders
+RedirectMatch 403 ^/(\.git|\.github|config\.php|db\.sql|\.env|\.htaccess|composer\.(json|lock)|package(-lock)?\.json)
+<FilesMatch "\.(sql|sh|log|bak|backup|old|orig|save|swp|tmp)$">
+  Require all denied
+</FilesMatch>

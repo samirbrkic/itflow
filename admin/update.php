@@ -21,13 +21,18 @@ $git_log = shell_exec("git log $repo_branch..origin/$repo_branch --pretty=format
 
             <!-- Check if git fetch result was successful (0), if not show a warning -->
             <?php if ($result !== 0) { ?>
-                <div class="alert alert-danger">
-                    <strong>WARNING: Could not find execute 'git fetch'.</strong>
+                <div class="alert alert-warning">
+                    <strong>Git Updates Not Available</strong>
                     <br><br>
-                    <i>Error details:- <?php echo shell_exec("git fetch 2>&1"); ?></i>
+                    <p>This installation is not running from a Git repository. Git-based updates are not available.</p>
+                    <p>If you installed ITFlow via a manual download or ZIP file, you'll need to update manually by downloading the latest release.</p>
                     <br>
-                    <br>Things to check: Is Git installed? Is the Git origin/remote correct? Are web server file permissions too strict?
-                    <br>Seek support on the <a href="https://forum.itflow.org">Forum</a> if required - include relevant PHP error logs & ITFlow debug output
+                    <strong>Options:</strong>
+                    <ul>
+                        <li>To use Git updates: Clone the repository using <code>git clone https://github.com/itflow-org/itflow.git</code></li>
+                        <li>To update manually: Download the latest version and replace your files</li>
+                        <li>Check the <a href="https://docs.itflow.org" target="_blank">documentation</a> for more information</li>
+                    </ul>
                 </div>
             <?php } ?>
 

@@ -510,6 +510,11 @@ if (isset($_POST['add_ticket_watcher'])) {
                 addToMailQueue($data);
             }
 
+            // Custom action handler for watcher notification
+            if ($notify && !empty($config_smtp_host)) {
+                customAction('ticket_watcher_add', $ticket_id);
+            }
+
             logAction("Ticket", "Edit", "$session_name added $watcher_email as a watcher for ticket $ticket_prefix$ticket_number", $client_id, $ticket_id);
         }
 
@@ -1163,8 +1168,6 @@ if (isset($_POST['bulk_resolve_tickets'])) {
 
                 logAction("Ticket", "Resolve", "$session_name resolved $ticket_prefix$ticket_number - $ticket_subject", $client_id, $ticket_id);
 
-                customAction('ticket_resolve', $ticket_id);
-
                 // Client notification email
                 if (!empty($config_smtp_host) && $config_ticket_client_general_notifications == 1 && $private_note == 0) {
 
@@ -1228,6 +1231,9 @@ if (isset($_POST['bulk_resolve_tickets'])) {
                         ];
                     }
                     addToMailQueue($data);
+                    
+                    // Custom action handler AFTER emails are queued so they can be updated
+                    customAction('ticket_resolve', $ticket_id);
                 } // End Mail IF
             } else {
                  $skipped_count++;
@@ -1308,8 +1314,6 @@ if (isset($_POST['bulk_ticket_reply'])) {
 
                 // Logging
                 logAction("Ticket", "Resolved", "$session_name resolved Ticket $ticket_prefix$ticket_number", $client_id, $ticket_id);
-
-                customAction('ticket_resolve', $ticket_id);
             }
 
             // Get Contact Details
@@ -1913,8 +1917,6 @@ if (isset($_GET['resolve_ticket'])) {
 
     logAction("Ticket", "Resolved", "$session_name resolved ticket $ticket_prefix$ticket_number (ID: $ticket_id)", 0, $ticket_id);
 
-    customAction('ticket_resolve', $ticket_id);
-
     // Client notification email
     if (!empty($config_smtp_host) && $config_ticket_client_general_notifications == 1) {
 
@@ -1987,6 +1989,9 @@ if (isset($_GET['resolve_ticket'])) {
             ];
         }
         addToMailQueue($data);
+        
+        // Custom action handler AFTER emails are queued so they can be updated
+        customAction('ticket_resolve', $ticket_id);
     }
     //End Mail IF
 
@@ -2009,8 +2014,6 @@ if (isset($_GET['close_ticket'])) {
     mysqli_query($mysqli, "INSERT INTO ticket_replies SET ticket_reply = 'Ticket closed.', ticket_reply_type = 'Internal', ticket_reply_time_worked = '00:01:00', ticket_reply_by = $session_user_id, ticket_reply_ticket_id = $ticket_id");
 
     logAction("Ticket", "Closed", "$session_name closed ticket ID $ticket_id", 0, $ticket_id);
-
-    customAction('ticket_close', $ticket_id);
 
     // Client notification email
     if (!empty($config_smtp_host) && $config_ticket_client_general_notifications == 1) {
@@ -2080,6 +2083,9 @@ if (isset($_GET['close_ticket'])) {
             ];
         }
         addToMailQueue($data);
+        
+        // Custom action handler AFTER emails are queued so they can be updated
+        customAction('ticket_close', $ticket_id);
     }
     //End Mail IF
 

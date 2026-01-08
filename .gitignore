@@ -55,3 +55,89 @@ api/v1/custom/*
 .zed
 
 
+db.sql
+config.php
+*.log
+# ITFlow - Empfohlene .gitignore für Sicherheit
+# Kopiere diese Einträge in deine .gitignore
+
+# === Sensible Konfiguration ===
+config.php
+.env
+.env.*
+*.key
+*.pem
+*.p12
+
+# === Datenbanken ===
+*.sql
+*.sqlite
+*.db
+db_backup_*.sql
+dump_*.sql
+
+# === Credentials & Secrets ===
+secrets.json
+credentials.json
+api_keys.json
+
+# === Backup-Dateien ===
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.swo
+*~
+.DS_Store
+
+# === Log-Dateien ===
+*.log
+logs/
+*.log.*
+
+# === Temporäre Dateien ===
+*.tmp
+*.temp
+tmp/
+temp/
+
+# === IDE/Editor Konfiguration ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# === System-Dateien ===
+Thumbs.db
+.DS_Store
+
+# === Node.js ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# === PHP ===
+vendor/
+composer.lock
+
+# === Cache & Compiled ===
+*.cache
+cache/
+.sass-cache/
+*.compiled
+
+# === Uploads (projekt-spezifisch) ===
+uploads/clients/*
+!uploads/clients/index.php
+uploads/documents/*
+!uploads/documents/index.php
+uploads/tickets/*
+!uploads/tickets/index.php
+
+# === Custom Development ===
+xcustom/*
+!xcustom/readme.php

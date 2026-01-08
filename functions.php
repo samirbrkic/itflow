@@ -1198,6 +1198,24 @@ function fetchUpdates() {
 
     global $repo_branch;
 
+    // Check if this is a git repository
+    exec("git rev-parse --is-inside-work-tree 2>&1", $git_check_output, $git_check_result);
+    
+    if ($git_check_result !== 0) {
+        // Not a git repository
+        $result = 1;
+        $latest_version = "N/A";
+        $current_version = "N/A";
+        $update_message = "Not a Git repository - updates via Git are not available";
+        
+        return (object) [
+            'result' => $result,
+            'latest_version' => $latest_version,
+            'current_version' => $current_version,
+            'update_message' => $update_message
+        ];
+    }
+
     // Fetch the latest code changes but don't apply them
     exec("git fetch", $output, $result);
     $latest_version = exec("git rev-parse origin/$repo_branch");

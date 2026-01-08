@@ -63,6 +63,10 @@ switch($trigger) {
     case 'ticket_close':
         handleTicketClosedEmail($entity);
         break;
+    
+    case 'ticket_watcher_add':
+        handleWatcherAddedEmail($entity);
+        break;
         
     // Weitere Trigger können hier hinzugefügt werden
     default:
@@ -121,9 +125,9 @@ function handleTicketCreateEmail($ticket_id) {
     
     $ticket = mysqli_fetch_assoc($sql);
     
-    // Auto-detect language
-    $content_for_detection = $ticket['ticket_details'] . ' ' . $ticket['ticket_subject'];
-    $lang = detectLanguage($content_for_detection);
+    // Use company locale for all emails
+    $lang = getUserLanguage();
+    error_log("✓ custom_action_handler: ticket_created language: $lang");
     
     // Get translations
     $trans = getEmailTranslations('ticket_created', $lang);
@@ -172,7 +176,9 @@ function handleTicketCreateEmail($ticket_id) {
             email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
             email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
         WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $ticket['contact_email']) . "'
-        AND email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+        AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%')
+        AND email_status = 0
         AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
         ORDER BY email_id DESC
         LIMIT 1
@@ -189,7 +195,9 @@ function handleTicketCreateEmail($ticket_id) {
                 email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
                 email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
             WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $watcher_email) . "'
-            AND email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+            AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+                 OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%')
+            AND email_status = 0
             AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
             ORDER BY email_id DESC
             LIMIT 1
@@ -243,9 +251,9 @@ function handleTicketReplyEmail($ticket_id) {
     $reply = mysqli_fetch_assoc($sql);
     error_log("✓ custom_action_handler: Found ticket reply_id=" . $reply['ticket_reply_id'] . " for ticket #" . $reply['ticket_prefix'] . $reply['ticket_number']);
     
-    // Auto-detect language
-    $content_for_detection = $reply['ticket_reply'] . ' ' . $reply['ticket_subject'];
-    $lang = detectLanguage($content_for_detection);
+    // Use company locale for all emails (ITFlow doesn't have per-user language settings)
+    $lang = getUserLanguage();
+    error_log("✓ custom_action_handler: Email language: $lang");
     
     // Get translations
     $trans = getEmailTranslations('ticket_reply', $lang);
@@ -285,7 +293,9 @@ function handleTicketReplyEmail($ticket_id) {
             email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
             email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
         WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $reply['contact_email']) . "'
-        AND email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $reply['ticket_prefix']) . mysqli_real_escape_string($mysqli, $reply['ticket_number']) . "]%'
+        AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $reply['ticket_prefix']) . mysqli_real_escape_string($mysqli, $reply['ticket_number']) . "]%'
+             OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $reply['ticket_prefix']) . mysqli_real_escape_string($mysqli, $reply['ticket_number']) . "]%')
+        AND email_status = 0
         AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
         ORDER BY email_id DESC
         LIMIT 1
@@ -302,6 +312,34 @@ function handleTicketReplyEmail($ticket_id) {
     } else {
         error_log("✗ custom_action_handler: No emails updated in queue (affected rows: $affected)");
         error_log("  This usually means the email was already sent or the WHERE conditions didn't match");
+    }
+    
+    // Update watcher emails (all use same language - company locale)
+    $sql_watchers = mysqli_query($mysqli, "SELECT watcher_email FROM ticket_watchers WHERE watcher_ticket_id = $ticket_id");
+    while ($row = mysqli_fetch_array($sql_watchers)) {
+        $watcher_email = sanitizeInput($row['watcher_email']);
+        
+        // All watchers get the same template (company locale)
+        // Future enhancement: Add per-contact language preference via custom field
+        
+        mysqli_query($mysqli, "
+            UPDATE email_queue 
+            SET 
+                email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
+                email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
+            WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $watcher_email) . "'
+            AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $reply['ticket_prefix']) . mysqli_real_escape_string($mysqli, $reply['ticket_number']) . "]%'
+                 OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $reply['ticket_prefix']) . mysqli_real_escape_string($mysqli, $reply['ticket_number']) . "]%')
+            AND email_status = 0
+            AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+            ORDER BY email_id DESC
+            LIMIT 1
+        ");
+        
+        $affected_watcher = mysqli_affected_rows($mysqli);
+        if ($affected_watcher > 0) {
+            error_log("✓ custom_action_handler: Updated watcher email for $watcher_email");
+        }
     }
 }
 
@@ -333,8 +371,9 @@ function handleTicketAssignedEmail($ticket_id) {
     
     $ticket = mysqli_fetch_assoc($sql);
     
-    // Auto-detect language
-    $lang = detectLanguage($ticket['ticket_details'] . ' ' . $ticket['ticket_subject']);
+    // Use company locale for all emails
+    $lang = getUserLanguage();
+    error_log("✓ custom_action_handler: ticket_assigned language: $lang");
     
     // Get translations
     $trans = getEmailTranslations('ticket_assigned', $lang);
@@ -373,7 +412,9 @@ function handleTicketAssignedEmail($ticket_id) {
             email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
             email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
         WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $ticket['assigned_to_email']) . "'
-        AND email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+        AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%')
+        AND email_status = 0
         AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
         ORDER BY email_id DESC
         LIMIT 1
@@ -412,13 +453,9 @@ function handleTicketResolvedEmail($ticket_id) {
     
     $ticket = mysqli_fetch_assoc($sql);
     
-    // Validate contact email
-    if (!filter_var($ticket['contact_email'], FILTER_VALIDATE_EMAIL)) {
-        return;
-    }
-    
-    // Auto-detect language
-    $lang = detectLanguage($ticket['ticket_details'] . ' ' . $ticket['ticket_subject']);
+    // Use company locale for all emails
+    $lang = getUserLanguage();
+    error_log("✓ custom_action_handler: handleTicketResolvedEmail() called for ticket #" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . " (language: $lang)");
     
     // Get translations
     $trans = getEmailTranslations('ticket_resolved', $lang);
@@ -437,7 +474,7 @@ function handleTicketResolvedEmail($ticket_id) {
         'ticket_subject' => sanitizeInput($ticket['ticket_subject']),
         'ticket_status' => sanitizeInput($ticket['ticket_status_name']),
         'ticket_priority' => sanitizeInput($ticket['ticket_priority']),
-        'ticket_created_at' => date('d.m.Y H:i', strtotime($ticket['ticket_resolved_at'] ?? $ticket['ticket_created'] ?? 'now')),
+        'ticket_created_at' => date('d.m.Y H:i', strtotime($ticket['ticket_resolved_at'] ?? $ticket['ticket_created_at'] ?? 'now')),
         'assigned_to_name' => $assigned_to_name,
         'contact_name' => sanitizeInput($ticket['contact_name']),
         'contact_email' => sanitizeInput($ticket['contact_email']),
@@ -460,25 +497,35 @@ function handleTicketResolvedEmail($ticket_id) {
     $html_body = renderEmailTemplate('ticket_resolved', $template_data, $lang);
     
     if ($html_body === false) {
+        error_log("✗ custom_action_handler: Failed to render ticket_resolved template");
         return;
     }
     
-    // Add email to queue
-    $subject = $trans['title'] . " [" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . "] - " . $ticket['ticket_subject'];
+    error_log("✓ custom_action_handler: Rendered ticket_resolved HTML (" . strlen($html_body) . " bytes) for ticket #" . $ticket['ticket_prefix'] . $ticket['ticket_number']);
     
-    // Escape HTML body to prevent SQL injection
-    $escaped_body = mysqli_real_escape_string($mysqli, $html_body);
+    // Update ALL emails in queue for this ticket (contact + watchers)
+    $subject = $trans['title'] . " - [#" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . "] - " . $ticket['ticket_subject'];
     
-    // Direct SQL INSERT to avoid mysqli_real_escape_string issues in addToMailQueue
-    mysqli_query($mysqli, "INSERT INTO email_queue SET 
-        email_recipient = '" . mysqli_real_escape_string($mysqli, $ticket['contact_email']) . "', 
-        email_recipient_name = '" . mysqli_real_escape_string($mysqli, $ticket['contact_name']) . "', 
-        email_from = '" . mysqli_real_escape_string($mysqli, $config_ticket_from_email) . "', 
-        email_from_name = '" . mysqli_real_escape_string($mysqli, $config_ticket_from_name) . "', 
-        email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "', 
-        email_content = '$escaped_body', 
-        email_queued_at = NOW()
-    ");
+    $update_query = "
+        UPDATE email_queue 
+        SET 
+            email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
+            email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
+        WHERE (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%resolved%')
+        AND email_status = 0
+        AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+    ";
+    
+    mysqli_query($mysqli, $update_query);
+    $affected = mysqli_affected_rows($mysqli);
+    
+    if ($affected > 0) {
+        error_log("✓ custom_action_handler: Successfully updated $affected ticket_resolved email(s)");
+    } else {
+        error_log("✗ custom_action_handler: No ticket_resolved emails updated (affected rows: $affected) - emails may have been sent already");
+    }
 }
 
 /**
@@ -513,13 +560,9 @@ function handleTicketClosedEmail($ticket_id) {
     
     $ticket = mysqli_fetch_assoc($sql);
     
-    // Validate contact email
-    if (!filter_var($ticket['contact_email'], FILTER_VALIDATE_EMAIL)) {
-        return;
-    }
-    
-    // Auto-detect language
-    $lang = detectLanguage($ticket['ticket_details'] . ' ' . $ticket['ticket_subject']);
+    // Use company locale for all emails
+    $lang = getUserLanguage();
+    error_log("✓ custom_action_handler: handleTicketClosedEmail() called for ticket #" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . " (language: $lang)");
     
     // Get translations
     $trans = getEmailTranslations('ticket_closed', $lang);
@@ -538,7 +581,7 @@ function handleTicketClosedEmail($ticket_id) {
         'ticket_subject' => sanitizeInput($ticket['ticket_subject']),
         'ticket_status' => sanitizeInput($ticket['ticket_status_name']),
         'ticket_priority' => sanitizeInput($ticket['ticket_priority']),
-        'ticket_closed_at' => date('d.m.Y H:i', strtotime($ticket['ticket_closed'] ?? 'now')),
+        'ticket_closed_at' => date('d.m.Y H:i', strtotime($ticket['ticket_closed_at'] ?? 'now')),
         'assigned_to_name' => $assigned_to_name,
         'contact_name' => sanitizeInput($ticket['contact_name']),
         'contact_email' => sanitizeInput($ticket['contact_email']),
@@ -552,25 +595,143 @@ function handleTicketClosedEmail($ticket_id) {
     $html_body = renderEmailTemplate('ticket_closed', $template_data, $lang);
     
     if ($html_body === false) {
+        error_log("✗ custom_action_handler: Failed to render ticket_closed template");
         return;
     }
     
-    // Add email to queue
-    $subject = $trans['title'] . " [" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . "] - " . $ticket['ticket_subject'];
+    error_log("✓ custom_action_handler: Rendered ticket_closed HTML (" . strlen($html_body) . " bytes) for ticket #" . $ticket['ticket_prefix'] . $ticket['ticket_number']);
     
-    // Escape HTML body to prevent SQL injection
-    $escaped_body = mysqli_real_escape_string($mysqli, $html_body);
+    // Update ALL emails in queue for this ticket (contact + watchers)
+    $subject = $trans['title'] . " - [#" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . "] - " . $ticket['ticket_subject'];
     
-    // Insert email directly into queue (bypassing addToMailQueue to avoid SQL issues)
-    mysqli_query($mysqli, "INSERT INTO email_queue SET 
-        email_recipient = '" . mysqli_real_escape_string($mysqli, $ticket['contact_email']) . "', 
-        email_recipient_name = '" . mysqli_real_escape_string($mysqli, $ticket['contact_name']) . "', 
-        email_from = '" . mysqli_real_escape_string($mysqli, $config_ticket_from_email) . "', 
-        email_from_name = '" . mysqli_real_escape_string($mysqli, $config_ticket_from_name) . "', 
-        email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "', 
-        email_content = '$escaped_body', 
-        email_queued_at = NOW()
+    $update_query = "
+        UPDATE email_queue 
+        SET 
+            email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
+            email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
+        WHERE (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+             OR email_subject LIKE '%closed%')
+        AND email_status = 0
+        AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+    ";
+    
+    mysqli_query($mysqli, $update_query);
+    $affected = mysqli_affected_rows($mysqli);
+    
+    if ($affected > 0) {
+        error_log("✓ custom_action_handler: Successfully updated $affected ticket_closed email(s)");
+    } else {
+        error_log("✗ custom_action_handler: No ticket_closed emails updated (affected rows: $affected) - emails may have been sent already");
+    }
+}
+
+/**
+ * Handler für ticket_watcher_add Trigger
+ * Konvertiert Plain-Text Watcher-Benachrichtigungen zu HTML
+ */
+function handleWatcherAddedEmail($ticket_id) {
+    global $mysqli, $config_ticket_from_email, $config_ticket_from_name, $config_base_url;
+    
+    // Get ticket & watcher details
+    $sql = mysqli_query($mysqli, "
+        SELECT 
+            t.ticket_id,
+            t.ticket_prefix,
+            t.ticket_number,
+            t.ticket_subject,
+            t.ticket_details,
+            t.ticket_priority,
+            t.ticket_status,
+            t.ticket_url_key,
+            ts.ticket_status_name,
+            c.contact_name,
+            c.contact_email
+        FROM tickets t
+        LEFT JOIN clients cl ON t.ticket_client_id = cl.client_id
+        LEFT JOIN contacts c ON t.ticket_contact_id = c.contact_id
+        LEFT JOIN ticket_statuses ts ON t.ticket_status = ts.ticket_status_id
+        WHERE t.ticket_id = $ticket_id
+        LIMIT 1
     ");
+    
+    if (!$sql || mysqli_num_rows($sql) == 0) {
+        error_log("✗ custom_action_handler: No ticket found for ticket_id=$ticket_id");
+        return;
+    }
+    
+    $ticket = mysqli_fetch_assoc($sql);
+    error_log("✓ custom_action_handler: handleWatcherAddedEmail() called for ticket #" . $ticket['ticket_prefix'] . $ticket['ticket_number']);
+    
+    // Use company locale for all watchers
+    $lang = getUserLanguage();
+    
+    // Update all watcher emails that were just added (last 1 minute)
+    $sql_watchers = mysqli_query($mysqli, "SELECT watcher_email FROM ticket_watchers WHERE watcher_ticket_id = $ticket_id");
+    
+    while ($row = mysqli_fetch_array($sql_watchers)) {
+        $watcher_email = sanitizeInput($row['watcher_email']);
+        
+        // Try to get watcher name from contacts table
+        $contact_name_query = mysqli_query($mysqli, "SELECT contact_name FROM contacts WHERE contact_email = '" . mysqli_real_escape_string($mysqli, $watcher_email) . "' LIMIT 1");
+        
+        if ($contact_name_query && mysqli_num_rows($contact_name_query) > 0) {
+            $contact_row = mysqli_fetch_assoc($contact_name_query);
+            $contact_name = $contact_row['contact_name'];
+        } else {
+            // If no contact found, use email username as fallback
+            $email_parts = explode('@', $watcher_email);
+            $contact_name = ucfirst($email_parts[0]); // "john.doe@example.com" -> "John.doe"
+        }
+        
+        // Prepare template variables for this specific watcher
+        $template_data = [
+            'ticket_id' => $ticket['ticket_id'],
+            'ticket_prefix' => sanitizeInput($ticket['ticket_prefix']),
+            'ticket_number' => intval($ticket['ticket_number']),
+            'ticket_subject' => sanitizeInput($ticket['ticket_subject']),
+            'ticket_status' => sanitizeInput($ticket['ticket_status_name']),
+            'ticket_details' => formatTicketDetailsForEmail($ticket['ticket_details']),
+            'ticket_url' => getTicketViewUrl($ticket['ticket_id'], $ticket['ticket_url_key'], $config_base_url),
+            'status_color' => getStatusColor($ticket['ticket_status_name']),
+            'config_base_url' => $config_base_url,
+            'contact_name' => sanitizeInput($contact_name)  // Add contact name for greeting
+        ];
+        
+        // Render template for this watcher
+        $html_body = renderEmailTemplate('watcher_added', $template_data, $lang);
+        
+        if ($html_body === false) {
+            error_log("✗ custom_action_handler: Failed to render watcher notification template for $watcher_email");
+            continue;
+        }
+        
+        error_log("✓ custom_action_handler: Rendered watcher notification HTML for $watcher_email (Contact: $contact_name, " . strlen($html_body) . " bytes)");
+        
+        $subject = "You've been added as collaborator [" . $ticket['ticket_prefix'] . $ticket['ticket_number'] . "] - " . $ticket['ticket_subject'];
+        
+        mysqli_query($mysqli, "
+            UPDATE email_queue 
+            SET 
+                email_subject = '" . mysqli_real_escape_string($mysqli, $subject) . "',
+                email_content = '" . mysqli_real_escape_string($mysqli, $html_body) . "'
+            WHERE email_recipient = '" . mysqli_real_escape_string($mysqli, $watcher_email) . "'
+            AND (email_subject LIKE '%[#" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+                 OR email_subject LIKE '%[" . mysqli_real_escape_string($mysqli, $ticket['ticket_prefix']) . mysqli_real_escape_string($mysqli, $ticket['ticket_number']) . "]%'
+                 OR email_subject LIKE 'Ticket Notification%')
+            AND email_status = 0
+            AND email_queued_at >= DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+            ORDER BY email_id DESC
+            LIMIT 1
+        ");
+        
+        $affected = mysqli_affected_rows($mysqli);
+        if ($affected > 0) {
+            error_log("✓ custom_action_handler: Updated watcher email for $watcher_email");
+        } else {
+            error_log("✗ custom_action_handler: No watcher email updated for $watcher_email");
+        }
+    }
 }
 
 /**

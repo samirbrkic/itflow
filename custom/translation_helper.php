@@ -55,6 +55,49 @@ function detectLanguage($text) {
     return $germanCount >= 2 ? 'de' : 'en';
 }
 
+/**
+ * Get user's preferred language from ITFlow database
+ * 
+ * Priority:
+ * 1. Company locale (company_locale from companies table) - System default for all users
+ * 2. Fallback to 'en' if not set
+ * 
+ * Note: ITFlow doesn't have per-user language settings yet (user_config_language doesn't exist).
+ * Future enhancement: Add custom field for contact-level language preference.
+ * 
+ * @param int|null $user_id ITFlow user ID (for agents) - Currently unused
+ * @param int|null $contact_id Contact ID (for clients) - Currently unused
+ * @param string|null $email Email address (fallback lookup) - Currently unused
+ * @return string Language code ('en' or 'de')
+ */
+function getUserLanguage($user_id = null, $contact_id = null, $email = null) {
+    global $mysqli, $session_company_locale;
+    
+    $lang = 'en'; // Default fallback
+    
+    // Priority 1: Use session company locale if available (already loaded in session)
+    if (isset($session_company_locale) && !empty($session_company_locale)) {
+        $lang = substr($session_company_locale, 0, 2);
+        error_log("getUserLanguage: Using company locale from session: $lang (session_company_locale: $session_company_locale)");
+        return $lang;
+    }
+    
+    // Priority 2: Query company locale from database
+    $sql = mysqli_query($mysqli, "SELECT company_locale FROM companies WHERE company_id = 1 LIMIT 1");
+    if ($sql && mysqli_num_rows($sql) > 0) {
+        $row = mysqli_fetch_assoc($sql);
+        if (!empty($row['company_locale'])) {
+            $company_locale = $row['company_locale'];
+            $lang = substr($company_locale, 0, 2);
+            error_log("getUserLanguage: Using company locale from DB: $lang (company_locale: $company_locale)");
+            return $lang;
+        }
+    }
+    
+    error_log("getUserLanguage: No language found, using fallback: $lang");
+    return $lang;
+}
+
 // Email-Template-Übersetzungen
 function getEmailTemplate($templateName, $lang = 'en') {
     $templates = [

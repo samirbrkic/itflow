@@ -1,0 +1,66 @@
+<!-- Watcher Added Template - Will be embedded in base_template.html -->
+
+<!-- Ticket Details Box -->
+<div class="ticket-details-box" style="background: linear-gradient(to right, #f8fafc 0%, #eef2ff 100%); border: 1px solid #e0e7ff; border-radius: 8px; padding: 16px 20px; margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <div class="ticket-details-title" style="font-size: 13px; font-weight: 700; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+        🎫 {{TICKET_DETAILS_TITLE}}
+    </div>
+    
+    <table class="ticket-details-table" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280; width: 110px;">
+                {{TICKET_LABEL}}:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937; font-weight: 600;">
+                {{TICKET_PREFIX}}{{TICKET_NUMBER}}
+            </td>
+        </tr>
+        
+        <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                {{SUBJECT_LABEL}}:
+            </td>
+            <td style="padding: 8px 0; color: #1f2937;">
+                {{TICKET_SUBJECT}}
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="padding: 8px 0; font-weight: 600; color: #6b7280;">
+                {{STATUS_LABEL}}:
+            </td>
+            <td style="padding: 8px 0;">
+                <span style="display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #ffffff; background-color: {{STATUS_COLOR}};">
+                    {{TICKET_STATUS}}
+                </span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Original Request -->
+<div class="content-section" style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-left: 3px solid #0ea5e9; border-radius: 8px; padding: 14px 18px; margin: 16px 0;">
+    <div class="content-section-title" style="font-size: 12px; font-weight: 700; color: #075985; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+        📋 {{ORIGINAL_REQUEST_LABEL}}
+    </div>
+    
+    <div class="content-section-body" style="font-size: 13px; color: #374151; line-height: 1.6; background-color: #ffffff; padding: 12px 14px; border-radius: 6px; border: 1px solid #f3f4f6;">
+        {{TICKET_DETAILS}}
+    </div>
+</div>
+
+<!-- View Ticket Button -->
+<div style="text-align: center; margin: 24px 0 20px 0;">
+    <!--[if mso]>
+    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{TICKET_URL}}" style="height:44px;v-text-anchor:middle;width:180px;" arcsize="15%" strokecolor="#667eea" fillcolor="#667eea">
+        <w:anchorlock/>
+        <center style="color:#ffffff;font-family:sans-serif;font-size:14px;font-weight:bold;">{{VIEW_BUTTON}}</center>
+    </v:roundrect>
+    <![endif]-->
+    <!--[if !mso]><!-->
+    <a href="{{TICKET_URL}}" style="display: inline-block; background-color: #667eea; background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff !important; text-decoration: none; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0.3px; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3); transition: all 0.2s;">
+        {{VIEW_BUTTON}}
+    </a>
+    <!--<![endif]-->
+</div>
+

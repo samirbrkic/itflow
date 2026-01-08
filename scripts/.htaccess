@@ -1,3 +1,2 @@
-<FilesMatch "\.(php)$">
-  Require all denied
-</FilesMatch>
+# Block ALL file access in scripts directory
+Require all denied
