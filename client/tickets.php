@@ -1,17 +1,78 @@
 <?php
 /*
  * Client Portal
- * Landing / Home page for the client portal
+ * Tickets Page with Pagination & Search
  */
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
+
+// AJAX mode for live search
+$ajax_mode = isset($_GET['ajax']) && $_GET['ajax'] == '1';
 
 require_once "includes/inc_all.php";
 
+// Badge color helper function (same as index.php)
+function getStatusBadgeClass($status_name) {
+    $status_lower = strtolower($status_name);
+    if (stripos($status_lower, 'open') !== false || stripos($status_lower, 'offen') !== false || 
+        stripos($status_lower, 'new') !== false || stripos($status_lower, 'neu') !== false) {
+        return 'badge-danger';
+    } elseif (stripos($status_lower, 'progress') !== false || stripos($status_lower, 'bearbeitung') !== false ||
+            stripos($status_lower, 'working') !== false || stripos($status_lower, 'arbeit') !== false ||
+            stripos($status_lower, 'assigned') !== false || stripos($status_lower, 'zugewiesen') !== false) {
+        return 'badge-primary';
+    } elseif (stripos($status_lower, 'waiting') !== false || stripos($status_lower, 'wartend') !== false ||
+            stripos($status_lower, 'warten') !== false || stripos($status_lower, 'wartet') !== false ||
+            stripos($status_lower, 'hold') !== false || stripos($status_lower, 'angehalten') !== false ||
+            stripos($status_lower, 'pending') !== false || stripos($status_lower, 'ausstehend') !== false) {
+        return 'badge-warning';
+    } elseif (stripos($status_lower, 'resolved') !== false || stripos($status_lower, 'gelöst') !== false ||
+            stripos($status_lower, 'closed') !== false || stripos($status_lower, 'geschlossen') !== false ||
+            stripos($status_lower, 'completed') !== false || stripos($status_lower, 'abgeschlossen') !== false ||
+            stripos($status_lower, 'erledigt') !== false) {
+        return 'badge-success';
+    } elseif (stripos($status_lower, 'cancelled') !== false || stripos($status_lower, 'canceled') !== false ||
+            stripos($status_lower, 'abgebrochen') !== false || stripos($status_lower, 'storniert') !== false) {
+        return 'badge-secondary';
+    }
+    return 'badge-secondary';
+}
 
-// Ticket status from GET
+// ========================================
+// PAGINATION & SEARCH PARAMETERS
+// ========================================
+
+// Search query
+$search_query = '';
+if (isset($_GET['q']) && !empty($_GET['q'])) {
+    $search_query = sanitizeInput($_GET['q']);
+}
+
+// Records per page
+$records_per_page = 20; // Default
+if (isset($_GET['records'])) {
+    $records_input = intval($_GET['records']);
+    if ($records_input == 0) {
+        $records_per_page = 9999999; // Show all
+    } elseif (in_array($records_input, [20, 50, 100])) {
+        $records_per_page = $records_input;
+    }
+}
+
+// Current page
+$page = 1;
+if (isset($_GET['page']) && intval($_GET['page']) > 0) {
+    $page = intval($_GET['page']);
+}
+
+$record_from = ($page - 1) * $records_per_page;
+$record_to = $records_per_page;
+
+// ========================================
+// TICKET STATUS FILTER
+// ========================================
+
 if (!isset($_GET['status']) || ($_GET['status']) == 'Open') {
-    // Default to showing open
     $status = 'Open';
     $ticket_status_snippet = "ticket_closed_at IS NULL";
 } elseif (isset($_GET['status']) && ($_GET['status']) == 'Closed') {
@@ -22,7 +83,52 @@ if (!isset($_GET['status']) || ($_GET['status']) == 'Open') {
     $ticket_status_snippet = "ticket_status LIKE '%'";
 }
 
-$contact_tickets = mysqli_query($mysqli, "SELECT ticket_id, ticket_prefix, ticket_number, ticket_subject, ticket_status_name FROM tickets LEFT JOIN contacts ON ticket_contact_id = contact_id LEFT JOIN ticket_statuses ON ticket_status = ticket_status_id WHERE $ticket_status_snippet AND ticket_contact_id = $session_contact_id AND ticket_client_id = $session_client_id ORDER BY ticket_id DESC");
+// ========================================
+// SEARCH WHERE CLAUSE (Extended)
+// ========================================
+
+$search_where = '';
+if (!empty($search_query)) {
+    $search_where = "AND (
+        CONCAT(tickets.ticket_prefix, tickets.ticket_number) LIKE '%$search_query%' 
+        OR tickets.ticket_subject LIKE '%$search_query%' 
+        OR tickets.ticket_details LIKE '%$search_query%'
+        OR ticket_status_name LIKE '%$search_query%'
+        OR contacts.contact_name LIKE '%$search_query%'
+        OR EXISTS (
+            SELECT 1 FROM ticket_replies 
+            WHERE ticket_replies.ticket_reply_ticket_id = tickets.ticket_id 
+            AND ticket_replies.ticket_reply LIKE '%$search_query%'
+        )
+    )";
+}
+
+// ========================================
+// TICKETS QUERY WITH PAGINATION
+// ========================================
+
+$contact_tickets = mysqli_query($mysqli, "SELECT SQL_CALC_FOUND_ROWS tickets.ticket_id, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, ticket_status_name 
+    FROM tickets 
+    LEFT JOIN contacts ON tickets.ticket_contact_id = contacts.contact_id 
+    LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id 
+    WHERE $ticket_status_snippet 
+    AND tickets.ticket_contact_id = $session_contact_id 
+    AND tickets.ticket_client_id = $session_client_id 
+    $search_where
+    ORDER BY tickets.ticket_id DESC 
+    LIMIT $record_from, $record_to");
+
+// Get total count for pagination
+$sql_total_found = mysqli_query($mysqli, "SELECT FOUND_ROWS()");
+$row_count = mysqli_fetch_array($sql_total_found);
+$total_found_tickets = intval($row_count[0]);
+
+// Calculate pagination
+$total_pages = ceil($total_found_tickets / $records_per_page);
+
+// ========================================
+// SIDEBAR STATISTICS
+// ========================================
 
 //Get Total tickets closed
 $sql_total_tickets_closed = mysqli_query($mysqli, "SELECT COUNT(ticket_id) AS total_tickets_closed FROM tickets WHERE ticket_closed_at IS NOT NULL AND ticket_client_id = $session_client_id AND ticket_contact_id = $session_contact_id");
@@ -39,18 +145,100 @@ $sql_total_tickets = mysqli_query($mysqli, "SELECT COUNT(ticket_id) AS total_tic
 $row = mysqli_fetch_array($sql_total_tickets);
 $total_tickets = intval($row['total_tickets']);
 
+// ========================================
+// BUILD PRESERVE PARAMETERS FOR LINKS
+// ========================================
+
+function buildQueryString($exclude = []) {
+    $params = [];
+    foreach ($_GET as $key => $value) {
+        if (!in_array($key, $exclude) && !empty($value)) {
+            $params[$key] = urlencode($value);
+        }
+    }
+    return !empty($params) ? '&' . http_build_query($params) : '';
+}
 
 ?>
 
+<!-- Header -->
 <div class="d-flex align-items-center mb-4">
     <div class="mr-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary-color), var(--accent-purple)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
         <i class="fas fa-ticket-alt fa-lg text-white"></i>
     </div>
     <h2 class="mb-0 text-gradient" style="font-weight: 700;"><?php echo __('client_portal_tickets', 'Tickets'); ?></h2>
 </div>
+
+<!-- Search & Filter Bar -->
+<div class="row mb-4">
+    <div class="col-md-10">
+        <div class="card shadow-soft">
+            <div class="card-body p-3">
+                <form method="get" class="form-inline">
+                    <!-- Preserve status parameter -->
+                    <?php if (isset($_GET['status'])) { ?>
+                    <input type="hidden" name="status" value="<?php echo htmlentities($_GET['status']); ?>">
+                    <?php } ?>
+                    
+                    <!-- Search Input -->
+                    <div class="input-group mr-3 mb-2" style="min-width: 300px;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input type="text" name="q" id="searchInput" class="form-control" placeholder="<?php echo __('client_portal_search_placeholder', 'Tickets durchsuchen...'); ?>" value="<?php echo htmlentities($search_query); ?>">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="searchSpinner" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Records per page Dropdown -->
+                    <div class="form-group mr-3 mb-2">
+                        <label class="mr-2 mb-0" style="font-weight: 600;"><?php echo __('client_portal_per_page', 'Pro Seite'); ?>:</label>
+                        <select name="records" id="recordsSelect" class="form-control" style="width: auto;">
+                            <option value="20" <?php if ($records_per_page == 20) echo 'selected'; ?>>20</option>
+                            <option value="50" <?php if ($records_per_page == 50) echo 'selected'; ?>>50</option>
+                            <option value="100" <?php if ($records_per_page == 100) echo 'selected'; ?>>100</option>
+                            <option value="0" <?php if ($records_per_page > 1000) echo 'selected'; ?>><?php echo __('client_portal_show_all', 'Alle'); ?></option>
+                        </select>
+                    </div>
+                    
+                    <!-- Search Button (optional, kept for manual search) -->
+                    <button type="submit" class="btn btn-primary mb-2" style="opacity: 0.7;">
+                        <i class="fas fa-search mr-2"></i><?php echo __('client_portal_action_search', 'Suchen'); ?>
+                    </button>
+                    
+                    <!-- Reset Button -->
+                    <?php if (!empty($search_query) || isset($_GET['records'])) { ?>
+                    <a href="?status=<?php echo urlencode($status); ?>" class="btn btn-secondary ml-2 mb-2">
+                        <i class="fas fa-times mr-2"></i>Reset
+                    </a>
+                    <?php } ?>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
 
+    <!-- Tickets Table -->
     <div class="col-md-10">
+        
+        <div id="ticketsContent">
+        <!-- Results Info -->
+        <?php if ($total_found_tickets > 0) { ?>
+        <div class="mb-3">
+            <small class="text-muted">
+                <?php echo __('client_portal_showing', 'Zeige'); ?> 
+                <strong><?php echo $record_from + 1; ?> - <?php echo min($record_from + $records_per_page, $total_found_tickets); ?></strong> 
+                <?php echo __('client_portal_of', 'von'); ?> 
+                <strong><?php echo $total_found_tickets; ?></strong> 
+                <?php echo __('client_portal_entries', 'Einträge'); ?>
+            </small>
+        </div>
+        <?php } ?>
 
         <table class="table shadow-soft rounded-modern">
             <thead>
@@ -63,15 +251,19 @@ $total_tickets = intval($row['total_tickets']);
             <tbody>
 
             <?php
-            while ($row = mysqli_fetch_array($contact_tickets)) {
-                $ticket_id = intval($row['ticket_id']);
-                $ticket_prefix = nullable_htmlentities($row['ticket_prefix']);
-                $ticket_number = intval($row['ticket_number']);
-                $ticket_subject = nullable_htmlentities($row['ticket_subject']);
-                $ticket_status_raw = nullable_htmlentities($row['ticket_status_name']);
-                
-                // Translate status name
-                $ticket_status = __('ticket_status_' . strtolower(str_replace(' ', '_', $ticket_status_raw)), $ticket_status_raw);
+            if (mysqli_num_rows($contact_tickets) > 0) {
+                while ($row = mysqli_fetch_array($contact_tickets)) {
+                    $ticket_id = intval($row['ticket_id']);
+                    $ticket_prefix = nullable_htmlentities($row['ticket_prefix']);
+                    $ticket_number = intval($row['ticket_number']);
+                    $ticket_subject = nullable_htmlentities($row['ticket_subject']);
+                    $ticket_status_raw = nullable_htmlentities($row['ticket_status_name']);
+                    
+                    // Translate status name
+                    $ticket_status = __('ticket_status_' . strtolower(str_replace(' ', '_', $ticket_status_raw)), $ticket_status_raw);
+                    
+                    // Get badge class
+                    $badge_class = getStatusBadgeClass($ticket_status);
             ?>
 
                 <tr>
@@ -84,53 +276,87 @@ $total_tickets = intval($row['total_tickets']);
                         <a href="ticket.php?id=<?php echo $ticket_id; ?>" style="color: var(--gray-800);"><?php echo $ticket_subject; ?></a>
                     </td>
                     <td>
-                        <?php
-                        // Determine badge color based on status (multilingual support)
-                        $badge_class = 'badge-secondary';
-                        $status_lower = strtolower($ticket_status);
-                        
-                        // Red: Open/New (Offen/Neu)
-                        if (strpos($status_lower, 'open') !== false || strpos($status_lower, 'offen') !== false || 
-                            strpos($status_lower, 'new') !== false || strpos($status_lower, 'neu') !== false) {
-                            $badge_class = 'badge-danger';
-                        } 
-                        // Blue: In Progress/Working/Assigned (In Bearbeitung/Zugewiesen)
-                        elseif (strpos($status_lower, 'progress') !== false || strpos($status_lower, 'bearbeitung') !== false ||
-                                strpos($status_lower, 'working') !== false || strpos($status_lower, 'arbeit') !== false ||
-                                strpos($status_lower, 'assigned') !== false || strpos($status_lower, 'zugewiesen') !== false) {
-                            $badge_class = 'badge-primary';
-                        } 
-                        // Orange: Waiting/Hold/Pending (Wartend/Warten/Ausstehend)
-                        elseif (strpos($status_lower, 'waiting') !== false || strpos($status_lower, 'wartend') !== false ||
-                                strpos($status_lower, 'warten') !== false || strpos($status_lower, 'wartet') !== false ||
-                                strpos($status_lower, 'hold') !== false || strpos($status_lower, 'angehalten') !== false ||
-                                strpos($status_lower, 'pending') !== false || strpos($status_lower, 'ausstehend') !== false) {
-                            $badge_class = 'badge-warning';
-                        } 
-                        // Green: Resolved/Closed/Completed (Gelöst/Geschlossen/Abgeschlossen)
-                        elseif (strpos($status_lower, 'resolved') !== false || strpos($status_lower, 'gelöst') !== false || strpos($status_lower, 'gelöst') !== false ||
-                                strpos($status_lower, 'closed') !== false || strpos($status_lower, 'geschlossen') !== false ||
-                                strpos($status_lower, 'completed') !== false || strpos($status_lower, 'abgeschlossen') !== false ||
-                                strpos($status_lower, 'erledigt') !== false) {
-                            $badge_class = 'badge-success';
-                        } 
-                        // Gray: Cancelled (Abgebrochen/Storniert)
-                        elseif (strpos($status_lower, 'cancelled') !== false || strpos($status_lower, 'canceled') !== false ||
-                                strpos($status_lower, 'abgebrochen') !== false || strpos($status_lower, 'storniert') !== false) {
-                            $badge_class = 'badge-secondary';
-                        }
-                        ?>
                         <span class="badge <?php echo $badge_class; ?>"><?php echo $ticket_status; ?></span>
                     </td>
                 </tr>
             <?php
+                }
+            } else {
+                ?>
+                <tr>
+                    <td colspan="3" class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x mb-3 text-muted" style="opacity: 0.3;"></i>
+                        <p class="text-muted"><?php echo __('client_portal_no_tickets_found', 'Keine Tickets gefunden'); ?></p>
+                        <?php if (!empty($search_query)) { ?>
+                        <a href="?status=<?php echo urlencode($status); ?>" class="btn btn-sm btn-primary">
+                            <i class="fas fa-times mr-1"></i>Suche zurücksetzen
+                        </a>
+                        <?php } ?>
+                    </td>
+                </tr>
+                <?php
             }
             ?>
             </tbody>
         </table>
 
+        <!-- Pagination -->
+        <?php if ($total_pages > 1) { ?>
+        <nav aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+                <!-- Previous Page -->
+                <?php if ($page > 1) { ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo $page - 1; ?><?php echo buildQueryString(['page']); ?>">
+                        <i class="fas fa-chevron-left mr-1"></i><?php echo __('client_portal_previous', 'Zurück'); ?>
+                    </a>
+                </li>
+                <?php } ?>
+                
+                <!-- Page Numbers -->
+                <?php
+                $start_page = max(1, $page - 2);
+                $end_page = min($total_pages, $page + 2);
+                
+                if ($start_page > 1) {
+                    echo '<li class="page-item"><a class="page-link" href="?page=1' . buildQueryString(['page']) . '">1</a></li>';
+                    if ($start_page > 2) {
+                        echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                    }
+                }
+                
+                for ($i = $start_page; $i <= $end_page; $i++) {
+                    if ($i == $page) {
+                        echo '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
+                    } else {
+                        echo '<li class="page-item"><a class="page-link" href="?page=' . $i . buildQueryString(['page']) . '">' . $i . '</a></li>';
+                    }
+                }
+                
+                if ($end_page < $total_pages) {
+                    if ($end_page < $total_pages - 1) {
+                        echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                    }
+                    echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . buildQueryString(['page']) . '">' . $total_pages . '</a></li>';
+                }
+                ?>
+                
+                <!-- Next Page -->
+                <?php if ($page < $total_pages) { ?>
+                <li class="page-item">
+                    <a class="page-link" href="?page=<?php echo $page + 1; ?><?php echo buildQueryString(['page']); ?>">
+                        <?php echo __('client_portal_next', 'Weiter'); ?><i class="fas fa-chevron-right ml-1"></i>
+                    </a>
+                </li>
+                <?php } ?>
+            </ul>
+        </nav>
+        <?php } ?>
+        </div><!-- #ticketsContent -->
+
     </div>
 
+    <!-- Sidebar -->
     <div class="col-md-2">
 
         <a href="ticket_add.php" class="btn btn-primary btn-block btn-lg mb-3 shadow-soft">
@@ -139,36 +365,33 @@ $total_tickets = intval($row['total_tickets']);
 
         <hr style="border-color: var(--gray-200);">
 
-        <a href="?status=Open" class="btn btn-danger btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+        <a href="?status=Open<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-danger btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
             <i class="fas fa-folder-open mr-2"></i><?php echo __('client_portal_ticket_open', 'My Open tickets'); ?>
             <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets_open ?></div>
         </a>
 
-        <a href="?status=Closed" class="btn btn-success btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+        <a href="?status=Closed<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-success btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
             <i class="fas fa-check-circle mr-2"></i><?php echo __('client_portal_ticket_closed', 'Closed tickets'); ?>
             <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets_closed ?></div>
         </a>
 
-        <a href="?status=%" class="btn btn-secondary btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+        <a href="?status=%<?php echo buildQueryString(['status', 'page']); ?>" class="btn btn-secondary btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
             <i class="fas fa-list mr-2"></i><?php echo __('client_portal_tickets', 'All my tickets'); ?>
             <div class="float-right" style="font-size: 1.25rem; font-weight: 700;"><?php echo $total_tickets ?></div>
         </a>
-        <?php
-        if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
-        ?>
-
+        
+        <?php if ($session_contact_primary == 1 || $session_contact_is_technical_contact) { ?>
         <hr style="border-color: var(--gray-200);">
 
         <a href="ticket_view_all.php" class="btn btn-dark btn-block p-2 mb-3 shadow-soft" style="border-radius: var(--radius-lg);">
             <i class="fas fa-globe mr-2"></i><?php echo __('client_portal_all_tickets', 'All Tickets'); ?>
         </a>
-
-        <?php
-        }
-        ?>
+        <?php } ?>
 
     </div>
 </div>
 
-<?php require_once "includes/footer.php";
- ?>
+<!-- Live Search Script -->
+<script src="../js/client_ticket_search.js"></script>
+
+<?php require_once "includes/footer.php"; ?>

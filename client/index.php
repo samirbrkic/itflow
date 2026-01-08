@@ -1,302 +1,486 @@
 <?php
 /*
  * Client Portal
- * Landing / Home page for the client portal
+ * Landing / Home page - Modern Dashboard with Ticket Overview
  */
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
 
 require_once "includes/inc_all.php";
 
-// Billing Card Queries
- //Add up all the payments for the invoice and get the total amount paid to the invoice
+// ========================================
+// BADGE COLOR HELPER FUNCTION (i18n-compliant)
+// ========================================
+
+function getStatusBadgeClass($status_name) {
+    $status_lower = strtolower($status_name);
+    
+    // Red: Open/New (Offen/Neu)
+    if (stripos($status_lower, 'open') !== false || stripos($status_lower, 'offen') !== false || 
+        stripos($status_lower, 'new') !== false || stripos($status_lower, 'neu') !== false) {
+        return 'badge-danger';
+    } 
+    // Blue: In Progress/Working/Assigned (In Bearbeitung/Zugewiesen)
+    elseif (stripos($status_lower, 'progress') !== false || stripos($status_lower, 'bearbeitung') !== false ||
+            stripos($status_lower, 'working') !== false || stripos($status_lower, 'arbeit') !== false ||
+            stripos($status_lower, 'assigned') !== false || stripos($status_lower, 'zugewiesen') !== false) {
+        return 'badge-primary';
+    } 
+    // Orange: Waiting/Hold/Pending (Wartend/Warten/Ausstehend)
+    elseif (stripos($status_lower, 'waiting') !== false || stripos($status_lower, 'wartend') !== false ||
+            stripos($status_lower, 'warten') !== false || stripos($status_lower, 'wartet') !== false ||
+            stripos($status_lower, 'hold') !== false || stripos($status_lower, 'angehalten') !== false ||
+            stripos($status_lower, 'pending') !== false || stripos($status_lower, 'ausstehend') !== false) {
+        return 'badge-warning';
+    } 
+    // Green: Resolved/Closed/Completed (Gelöst/Geschlossen/Abgeschlossen)
+    elseif (stripos($status_lower, 'resolved') !== false || stripos($status_lower, 'gelöst') !== false ||
+            stripos($status_lower, 'closed') !== false || stripos($status_lower, 'geschlossen') !== false ||
+            stripos($status_lower, 'completed') !== false || stripos($status_lower, 'abgeschlossen') !== false ||
+            stripos($status_lower, 'erledigt') !== false) {
+        return 'badge-success';
+    } 
+    // Gray: Cancelled (Abgebrochen/Storniert)
+    elseif (stripos($status_lower, 'cancelled') !== false || stripos($status_lower, 'canceled') !== false ||
+            stripos($status_lower, 'abgebrochen') !== false || stripos($status_lower, 'storniert') !== false) {
+        return 'badge-secondary';
+    }
+    
+    // Default
+    return 'badge-secondary';
+}
+
+// ========================================
+// VIEW FILTER PARAMETER
+// ========================================
+
+$view_filter = isset($_GET['view']) && $_GET['view'] == 'my' ? 'my' : 'all';
+
+// ========================================
+// TICKET STATISTICS - COMPANY WIDE
+// ========================================
+
+// Total Open Tickets (Company)
+$sql_open_tickets = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets WHERE ticket_client_id = $session_client_id AND ticket_closed_at IS NULL");
+$row = mysqli_fetch_array($sql_open_tickets);
+$total_open_tickets = intval($row['count']);
+
+// Total In Progress Tickets (Company)
+$sql_in_progress = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets 
+    LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id 
+    WHERE ticket_client_id = $session_client_id 
+    AND ticket_closed_at IS NULL 
+    AND (LOWER(ticket_status_name) LIKE '%progress%' OR LOWER(ticket_status_name) LIKE '%bearbeitung%' OR LOWER(ticket_status_name) LIKE '%working%' OR LOWER(ticket_status_name) LIKE '%arbeit%')");
+$row = mysqli_fetch_array($sql_in_progress);
+$total_in_progress = intval($row['count']);
+
+// Total Resolved Today (Company)
+$sql_resolved_today = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets 
+    LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id 
+    WHERE ticket_client_id = $session_client_id 
+    AND DATE(ticket_closed_at) = CURDATE()
+    AND (LOWER(ticket_status_name) LIKE '%resolved%' OR LOWER(ticket_status_name) LIKE '%gelöst%')");
+$row = mysqli_fetch_array($sql_resolved_today);
+$total_resolved_today = intval($row['count']);
+
+// Total Tickets (Company)
+$sql_total_tickets = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets WHERE ticket_client_id = $session_client_id");
+$row = mysqli_fetch_array($sql_total_tickets);
+$total_tickets_company = intval($row['count']);
+
+// ========================================
+// MY TICKET STATISTICS
+// ========================================
+
+// My Open Tickets
+$sql_my_open = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets WHERE ticket_client_id = $session_client_id AND ticket_contact_id = $session_contact_id AND ticket_closed_at IS NULL");
+$row = mysqli_fetch_array($sql_my_open);
+$my_open_tickets = intval($row['count']);
+
+// My Total Tickets
+$sql_my_total = mysqli_query($mysqli, "SELECT COUNT(*) as count FROM tickets WHERE ticket_client_id = $session_client_id AND ticket_contact_id = $session_contact_id");
+$row = mysqli_fetch_array($sql_my_total);
+$my_total_tickets = intval($row['count']);
+
+// ========================================
+// RECENT TICKET UPDATES (5 fixed)
+// ========================================
+
+if ($view_filter == 'my') {
+    // Show only my tickets
+    $sql_recent_tickets = mysqli_query($mysqli, "SELECT tickets.ticket_id, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, 
+        tickets.ticket_created_at, tickets.ticket_updated_at, ticket_statuses.ticket_status_name, contacts.contact_name
+        FROM tickets 
+        LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id
+        LEFT JOIN contacts ON tickets.ticket_contact_id = contacts.contact_id
+        WHERE tickets.ticket_client_id = $session_client_id AND tickets.ticket_contact_id = $session_contact_id
+        ORDER BY tickets.ticket_updated_at DESC 
+        LIMIT 5");
+} else {
+    // Show all company tickets
+    $sql_recent_tickets = mysqli_query($mysqli, "SELECT tickets.ticket_id, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, 
+        tickets.ticket_created_at, tickets.ticket_updated_at, ticket_statuses.ticket_status_name, contacts.contact_name
+        FROM tickets 
+        LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id
+        LEFT JOIN contacts ON tickets.ticket_contact_id = contacts.contact_id
+        WHERE tickets.ticket_client_id = $session_client_id 
+        ORDER BY tickets.ticket_updated_at DESC 
+        LIMIT 5");
+}
+
+// ========================================
+// COMPANY CONTACT INFO
+// ========================================
+
+$sql_company_info = mysqli_query($mysqli, "SELECT company_name, company_phone, company_email, company_website 
+    FROM companies WHERE company_id = 1");
+$row = mysqli_fetch_array($sql_company_info);
+$support_company_name = nullable_htmlentities($row['company_name']);
+$support_company_phone = nullable_htmlentities($row['company_phone']);
+$support_company_email = nullable_htmlentities($row['company_email']);
+$support_company_website = nullable_htmlentities($row['company_website']);
+
+// Billing & Technical queries (keep existing for optional cards)
 $sql_invoice_amounts = mysqli_query($mysqli, "SELECT SUM(invoice_amount) AS invoice_amounts FROM invoices WHERE invoice_client_id = $session_client_id AND invoice_status != 'Draft' AND invoice_status != 'Cancelled' AND invoice_status != 'Non-Billable'");
 $row = mysqli_fetch_array($sql_invoice_amounts);
-
 $invoice_amounts = floatval($row['invoice_amounts']);
 
 $sql_amount_paid = mysqli_query($mysqli, "SELECT SUM(payment_amount) AS amount_paid FROM payments, invoices WHERE payment_invoice_id = invoice_id AND invoice_client_id = $session_client_id");
 $row = mysqli_fetch_array($sql_amount_paid);
-
 $amount_paid = floatval($row['amount_paid']);
-
 $balance = $invoice_amounts - $amount_paid;
 
-//Get Monthly Recurring Total
 $sql_recurring_monthly_total = mysqli_query($mysqli, "SELECT SUM(recurring_invoice_amount) AS recurring_monthly_total FROM recurring_invoices WHERE recurring_invoice_status = 1 AND recurring_invoice_frequency = 'month' AND recurring_invoice_client_id = $session_client_id");
 $row = mysqli_fetch_array($sql_recurring_monthly_total);
-
 $recurring_monthly_total = floatval($row['recurring_monthly_total']);
 
-//Get Yearly Recurring Total
-$sql_recurring_yearly_total = mysqli_query($mysqli, "SELECT SUM(recurring_invoice_amount) AS recurring_yearly_total FROM recurring_invoices WHERE recurring_invoice_status = 1 AND recurring_invoice_frequency = 'year' AND recurring_invoice_client_id = $session_client_id");
-$row = mysqli_fetch_array($sql_recurring_yearly_total);
-
-$recurring_yearly_total = floatval($row['recurring_yearly_total']) / 12;
-
-$recurring_monthly = $recurring_monthly_total + $recurring_yearly_total;
-
-// Technical Card Queries
-// 8 - 45 Day Warning
-
-// Get Domains Expiring
-$sql_domains_expiring = mysqli_query(
-    $mysqli,
-    "SELECT * FROM domains
-    WHERE domain_client_id = $session_client_id
-        AND domain_expire IS NOT NULL
-        AND domain_archived_at IS NULL
-        AND domain_expire > CURRENT_DATE
-        AND domain_expire < CURRENT_DATE + INTERVAL 45 DAY
-    ORDER BY domain_expire ASC"
-);
-
-// Get Certificates Expiring
-$sql_certificates_expiring = mysqli_query(
-    $mysqli,
-    "SELECT * FROM certificates
-    WHERE certificate_client_id = $session_client_id
-        AND certificate_expire IS NOT NULL
-        AND certificate_archived_at IS NULL
-        AND certificate_expire > CURRENT_DATE
-        AND certificate_expire < CURRENT_DATE + INTERVAL 45 DAY
-    ORDER BY certificate_expire ASC"
-);
-
-// Get Licenses Expiring
-$sql_licenses_expiring = mysqli_query(
-    $mysqli,
-    "SELECT * FROM software
-    WHERE software_client_id = $session_client_id
-        AND software_expire IS NOT NULL
-        AND software_archived_at IS NULL
-        AND software_expire > CURRENT_DATE
-        AND software_expire < CURRENT_DATE + INTERVAL 45 DAY
-    ORDER BY software_expire ASC"
-);
-
-// Get Asset Warranties Expiring
-$sql_asset_warranties_expiring = mysqli_query(
-    $mysqli,
-    "SELECT * FROM assets
-    WHERE asset_client_id = $session_client_id
-        AND asset_warranty_expire IS NOT NULL
-        AND asset_archived_at IS NULL
-        AND asset_warranty_expire > CURRENT_DATE
-        AND asset_warranty_expire < CURRENT_DATE + INTERVAL 45 DAY
-    ORDER BY asset_warranty_expire ASC"
-);
-
-// Get Assets Retiring 7 Year
-$sql_asset_retire = mysqli_query(
-    $mysqli,
-    "SELECT * FROM assets
-    WHERE asset_client_id = $session_client_id
-        AND asset_install_date IS NOT NULL
-        AND asset_archived_at IS NULL
-        AND asset_install_date + INTERVAL 7 YEAR > CURRENT_DATE
-        AND asset_install_date + INTERVAL 7 YEAR <= CURRENT_DATE + INTERVAL 45 DAY
-    ORDER BY asset_install_date ASC"
-);
-
-/*
- * EXPIRED ITEMS
- */
-
-// Get Domains Expired
-$sql_domains_expired = mysqli_query(
-    $mysqli,
-    "SELECT * FROM domains
-    WHERE domain_client_id = $session_client_id
-        AND domain_expire IS NOT NULL
-        AND domain_archived_at IS NULL
-        AND domain_expire < CURRENT_DATE
-    ORDER BY domain_expire ASC"
-);
-
-// Get Certificates Expired
-$sql_certificates_expired = mysqli_query(
-    $mysqli,
-    "SELECT * FROM certificates
-    WHERE certificate_client_id = $session_client_id
-        AND certificate_expire IS NOT NULL
-        AND certificate_archived_at IS NULL
-        AND certificate_expire < CURRENT_DATE
-    ORDER BY certificate_expire ASC"
-);
-
-// Get Licenses Expired
-$sql_licenses_expired = mysqli_query(
-    $mysqli,
-    "SELECT * FROM software
-    WHERE software_client_id = $session_client_id
-        AND software_expire IS NOT NULL
-        AND software_archived_at IS NULL
-        AND software_expire < CURRENT_DATE
-    ORDER BY software_expire ASC"
-);
-
-// Get Asset Warranties Expired
-$sql_asset_warranties_expired = mysqli_query(
-    $mysqli,
-    "SELECT * FROM assets
-    WHERE asset_client_id = $session_client_id
-        AND asset_warranty_expire IS NOT NULL
-        AND asset_archived_at IS NULL
-        AND asset_warranty_expire < CURRENT_DATE
-    ORDER BY asset_warranty_expire ASC"
-);
-
-// Get Retired Assets
-$sql_asset_retired = mysqli_query(
-    $mysqli,
-    "SELECT * FROM assets
-    WHERE asset_client_id = $session_client_id
-        AND asset_install_date IS NOT NULL
-        AND asset_archived_at IS NULL
-        AND asset_install_date + INTERVAL 7 YEAR < CURRENT_DATE  -- Assets retired (installed more than 7 years ago)
-    ORDER BY asset_install_date ASC"
-);
-
-// Assigned Assets
-$sql_assigned_assets = mysqli_query(
-    $mysqli,
-    "SELECT * FROM assets
-    WHERE asset_contact_id = $session_contact_id
-        AND asset_archived_at IS NULL
-    ORDER BY asset_name ASC"
-);
+$sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_contact_id = $session_contact_id AND asset_archived_at IS NULL ORDER BY asset_name ASC");
 
 ?>
+
+<!-- Dashboard Header -->
 <div class="row mb-4">
-    <div class="col-md-3">
-        <a href="ticket_add.php" class="btn btn-primary btn-lg btn-block shadow-soft">
-            <i class="fas fa-plus-circle mr-2"></i><?php echo __('client_portal_new_ticket', 'New ticket'); ?>
+    <div class="col-md-8">
+        <div class="d-flex align-items-center mb-3">
+            <div class="mr-3" style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--accent-purple)); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg);">
+                <i class="fas fa-chart-line fa-2x text-white"></i>
+            </div>
+            <div>
+                <h2 class="mb-0" style="font-weight: 700; color: var(--gray-800);"><?php echo __('client_portal_dashboard', 'Dashboard'); ?></h2>
+                <p class="text-muted mb-0"><?php echo __('client_portal_welcome_overview', 'Willkommen zur Übersicht'); ?></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 text-right">
+        <a href="ticket_add.php" class="btn btn-primary btn-lg shadow-soft">
+            <i class="fas fa-plus-circle mr-2"></i><?php echo __('client_portal_new_ticket', 'Neues Ticket'); ?>
         </a>
     </div>
 </div>
-<?php
-// Billing Cards
-if ($session_contact_primary == 1 || $session_contact_is_billing_contact) { ?>
 
+<!-- View Filter Toggle -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="btn-group shadow-sm" role="group">
+            <a href="?view=all" class="btn <?php echo $view_filter == 'all' ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                <i class="fas fa-building mr-2"></i><?php echo __('client_portal_all_company_tickets', 'Alle Tickets der Firma'); ?> (<?php echo $total_tickets_company; ?>)
+            </a>
+            <a href="?view=my" class="btn <?php echo $view_filter == 'my' ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                <i class="fas fa-user mr-2"></i><?php echo __('client_portal_my_tickets', 'Meine Tickets'); ?> (<?php echo $my_total_tickets; ?>)
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Ticket Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-soft" style="border-left: 4px solid var(--danger-color);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_open_tickets', 'Offen'); ?></h6>
+                        <h2 class="mb-0" style="font-weight: 700; color: var(--danger-color);"><?php echo $view_filter == 'my' ? $my_open_tickets : $total_open_tickets; ?></h2>
+                    </div>
+                    <div style="width: 50px; height: 50px; background: var(--danger-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-folder-open fa-lg" style="color: var(--danger-color);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-soft" style="border-left: 4px solid var(--primary-color);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_in_progress', 'In Bearbeitung'); ?></h6>
+                        <h2 class="mb-0" style="font-weight: 700; color: var(--primary-color);"><?php echo $total_in_progress; ?></h2>
+                    </div>
+                    <div style="width: 50px; height: 50px; background: var(--primary-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-spinner fa-lg" style="color: var(--primary-color);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-soft" style="border-left: 4px solid var(--success-color);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_resolved_today', 'Heute gelöst'); ?></h6>
+                        <h2 class="mb-0" style="font-weight: 700; color: var(--success-color);"><?php echo $total_resolved_today; ?></h2>
+                    </div>
+                    <div style="width: 50px; height: 50px; background: var(--success-light); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-check-circle fa-lg" style="color: var(--success-color);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-soft" style="border-left: 4px solid var(--gray-600);">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2" style="font-weight: 600; text-transform: uppercase; font-size: 0.75rem;"><?php echo __('client_portal_total_tickets', 'Gesamt'); ?></h6>
+                        <h2 class="mb-0" style="font-weight: 700; color: var(--gray-700);"><?php echo $view_filter == 'my' ? $my_total_tickets : $total_tickets_company; ?></h2>
+                    </div>
+                    <div style="width: 50px; height: 50px; background: var(--gray-100); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-list fa-lg" style="color: var(--gray-600);"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
 <div class="row">
+    
+    <!-- Left Column: Recent Ticket Updates -->
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-soft">
+            <div class="card-header" style="background: white; border-bottom: 2px solid var(--gray-100);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="font-weight: 600; color: var(--gray-800);">
+                        <i class="fas fa-clock mr-2" style="color: var(--primary-color);"></i>
+                        <?php echo __('client_portal_recent_updates', 'Letzte Ticket-Updates'); ?>
+                    </h5>
+                    <a href="tickets.php" class="btn btn-sm btn-outline-primary">
+                        <?php echo __('client_portal_view_all', 'Alle anzeigen'); ?> <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <?php
+                if (mysqli_num_rows($sql_recent_tickets) > 0) {
+                    while ($row = mysqli_fetch_array($sql_recent_tickets)) {
+                        $ticket_id = intval($row['ticket_id']);
+                        $ticket_prefix = nullable_htmlentities($row['ticket_prefix']);
+                        $ticket_number = intval($row['ticket_number']);
+                        $ticket_subject = nullable_htmlentities($row['ticket_subject']);
+                        $ticket_status_raw = nullable_htmlentities($row['ticket_status_name']);
+                        $ticket_updated_at = nullable_htmlentities($row['ticket_updated_at']);
+                        $ticket_contact_name = nullable_htmlentities($row['contact_name']);
+                        
+                        // Translate status
+                        $ticket_status = __('ticket_status_' . strtolower(str_replace(' ', '_', $ticket_status_raw)), $ticket_status_raw);
+                        
+                        // Get badge color using helper function
+                        $badge_class = getStatusBadgeClass($ticket_status);
+                        
+                        $time_ago = timeAgo($ticket_updated_at);
+                        ?>
+                        <div class="p-3 ticket-item" style="border-bottom: 1px solid var(--gray-100); transition: var(--transition-fast);">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <a href="ticket.php?id=<?php echo $ticket_id; ?>" class="ticket-link" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
+                                            <i class="fas fa-hashtag mr-1"></i><?php echo $ticket_prefix . $ticket_number; ?>
+                                        </a>
+                                        <span class="badge <?php echo $badge_class; ?> ml-2"><?php echo $ticket_status; ?></span>
+                                    </div>
+                                    <h6 class="mb-1" style="color: var(--gray-800);">
+                                        <a href="ticket.php?id=<?php echo $ticket_id; ?>" style="color: var(--gray-800); text-decoration: none;">
+                                            <?php echo $ticket_subject; ?>
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user mr-1"></i><?php echo $ticket_contact_name; ?>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-clock mr-1"></i>Aktualisiert <?php echo $time_ago; ?>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                } else {
+                    ?>
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-inbox fa-3x mb-3" style="opacity: 0.3;"></i>
+                        <p class="mb-0"><?php echo __('client_portal_no_tickets_found', 'Keine Tickets vorhanden'); ?></p>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+    </div>
 
+    <!-- Right Column: Support Contact & Quick Links -->
+    <div class="col-md-4">
+        
+        <!-- Support Contact Card -->
+        <div class="card shadow-soft mb-4" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-purple));">
+            <div class="card-body text-white">
+                <h5 class="mb-3" style="font-weight: 600;">
+                    <i class="fas fa-headset mr-2"></i><?php echo __('client_portal_support_contact', 'Support kontaktieren'); ?>
+                </h5>
+                <div class="mb-3">
+                    <?php if (!empty($support_company_phone)) { ?>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-phone-alt mr-2" style="width: 20px;"></i>
+                        <a href="tel:<?php echo $support_company_phone; ?>" style="color: white; text-decoration: none; font-weight: 500;">
+                            <?php echo $support_company_phone; ?>
+                        </a>
+                    </div>
+                    <?php } ?>
+                    <?php if (!empty($support_company_email)) { ?>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-envelope mr-2" style="width: 20px;"></i>
+                        <a href="mailto:<?php echo $support_company_email; ?>" style="color: white; text-decoration: none; font-weight: 500;">
+                            <?php echo $support_company_email; ?>
+                        </a>
+                    </div>
+                    <?php } ?>
+                    <?php if (!empty($support_company_website)) { ?>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-globe mr-2" style="width: 20px;"></i>
+                        <a href="<?php echo $support_company_website; ?>" target="_blank" style="color: white; text-decoration: none; font-weight: 500;">
+                            Website
+                        </a>
+                    </div>
+                    <?php } ?>
+                </div>
+                <div class="pt-3" style="border-top: 1px solid rgba(255,255,255,0.2);">
+                    <small><i class="fas fa-clock mr-2"></i><?php echo __('client_portal_support_hours', 'Mo-Fr 8-18 Uhr'); ?></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links Card -->
+        <div class="card shadow-soft">
+            <div class="card-header" style="background: white; border-bottom: 2px solid var(--gray-100);">
+                <h5 class="mb-0" style="font-weight: 600; color: var(--gray-800);">
+                    <i class="fas fa-bolt mr-2" style="color: var(--warning-color);"></i>
+                    <?php echo __('client_portal_quick_links', 'Schnellzugriff'); ?>
+                </h5>
+            </div>
+            <div class="card-body p-2">
+                <a href="tickets.php" class="btn btn-light btn-block text-left mb-2" style="border-radius: var(--radius-lg);">
+                    <i class="fas fa-ticket-alt mr-2" style="color: var(--primary-color);"></i><?php echo __('client_portal_tickets', 'Alle Tickets'); ?>
+                </a>
+                <a href="ticket_add.php" class="btn btn-light btn-block text-left mb-2" style="border-radius: var(--radius-lg);">
+                    <i class="fas fa-plus-circle mr-2" style="color: var(--success-color);"></i><?php echo __('client_portal_new_ticket', 'Neues Ticket'); ?>
+                </a>
+                <?php if ($session_contact_primary == 1 || $session_contact_is_billing_contact) { ?>
+                <a href="invoices.php" class="btn btn-light btn-block text-left mb-2" style="border-radius: var(--radius-lg);">
+                    <i class="fas fa-file-invoice-dollar mr-2" style="color: var(--accent-blue);"></i><?php echo __('client_portal_invoices', 'Rechnungen'); ?>
+                </a>
+                <?php } ?>
+                <?php if ($session_contact_primary == 1 || $session_contact_is_technical_contact) { ?>
+                <a href="documents.php" class="btn btn-light btn-block text-left" style="border-radius: var(--radius-lg);">
+                    <i class="fas fa-file-alt mr-2" style="color: var(--accent-purple);"></i><?php echo __('client_portal_documents', 'Dokumente'); ?>
+                </a>
+                <?php } ?>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Optional: Billing & Technical Cards (if data exists) -->
+<?php if (($session_contact_primary == 1 || $session_contact_is_billing_contact) && ($balance > 0 || $recurring_monthly_total > 0)) { ?>
+<div class="row mt-4">
+    <div class="col-12">
+        <h5 class="mb-3" style="font-weight: 600; color: var(--gray-700);">
+            <i class="fas fa-wallet mr-2"></i><?php echo __('client_portal_financial_overview', 'Finanzübersicht'); ?>
+        </h5>
+    </div>
+    
     <?php if ($balance > 0) { ?>
-    <div class="col-sm-3">
+    <div class="col-md-4 mb-3">
         <a href="unpaid_invoices.php" class="card text-dark">
             <div class="card-header" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
-                <h3 class="card-title"><i class="fas fa-exclamation-circle mr-2"></i><?php echo __('client_portal_account_balance', 'Account Balance'); ?></h3>
+                <h3 class="card-title"><i class="fas fa-exclamation-circle mr-2"></i><?php echo __('client_portal_account_balance', 'Offener Betrag'); ?></h3>
             </div>
             <div class="card-body text-center">
                 <div class="h4 text-danger mb-0"><b><?php echo numfmt_format_currency($currency_format, $balance, $session_company_currency); ?></b></div>
-                <small class="text-muted"><i class="fas fa-arrow-right mr-1"></i>View unpaid invoices</small>
+                <small class="text-muted"><i class="fas fa-arrow-right mr-1"></i>Unbezahlte Rechnungen anzeigen</small>
             </div>
         </a>
     </div>
     <?php } ?>
 
     <?php if ($recurring_monthly_total > 0) { ?>
-    <div class="col-sm-3">
+    <div class="col-md-4 mb-3">
         <a href="recurring_invoices.php" class="card text-dark">
             <div class="card-header" style="background: linear-gradient(135deg, #10B981, #059669);">
-                <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i><?php echo __('client_portal_recurring_monthly', 'Recurring Monthly'); ?></h3>
+                <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i><?php echo __('client_portal_recurring_monthly', 'Monatlich wiederkehrend'); ?></h3>
             </div>
             <div class="card-body text-center">
                 <div class="h4 mb-0" style="color: var(--success-color);"><b><?php echo numfmt_format_currency($currency_format, $recurring_monthly_total, $session_company_currency); ?></b></div>
-                <small class="text-muted"><i class="fas fa-calendar-alt mr-1"></i>Per month</small>
+                <small class="text-muted"><i class="fas fa-calendar-alt mr-1"></i>Pro Monat</small>
             </div>
         </a>
     </div>
     <?php } ?>
-
 </div>
-
-<?php } //End Billing Cards ?>
-
-<?php
-// Technical Cards
-if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
-?>
-
-<div class="row">
-
-    <?php if (mysqli_num_rows($sql_domains_expiring) > 0) { ?>
-    <div class="col-sm-3">
-        <a href="domains.php" class="card text-dark">
-            <div class="card-header" style="background: linear-gradient(135deg, #3B82F6, #14B8A6);">
-                <h3 class="card-title"><i class="fas fa-globe mr-2"></i><?php echo __('client_portal_domains_expiring', 'Domains Expiring'); ?></h3>
-            </div>
-            <div class="card-body">
-                <?php
-
-                while ($row = mysqli_fetch_array($sql_domains_expiring)) {
-                    $domain_id = intval($row['domain_id']);
-                    $domain_name = nullable_htmlentities($row['domain_name']);
-                    $domain_expire = nullable_htmlentities($row['domain_expire']);
-                    $domain_expire_human = timeAgo($row['domain_expire']);
-
-                    ?>
-                    <div class="mb-3 pb-2" style="border-bottom: 1px solid var(--gray-100);">
-                        <div class="d-flex align-items-center mb-1">
-                            <i class="fas fa-clock text-warning mr-2"></i>
-                            <strong style="color: var(--gray-800);"><?php echo $domain_name; ?></strong>
-                        </div>
-                        <small class="text-muted"><i class="fas fa-calendar mr-1"></i><?php echo $domain_expire; ?> (<?php echo $domain_expire_human; ?>)</small>
-                    </div>
-                    <?php
-                }
-                ?>
-            </div>
-        </a>
-    </div>
-    <?php } ?>
-
-</div>
-
 <?php } ?>
 
-<?php
-// Everone Cards
-?>
-<div class="row">
-    <?php if (mysqli_num_rows($sql_assigned_assets) > 0) { ?>
-    <div class="col-sm-3">
-        <a href="assets.php" class="card text-dark">
-            <div class="card-header" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">
-                <h3 class="card-title"><i class="fas fa-desktop mr-2"></i><?php echo __('client_portal_your_assigned_assets', 'Your Assigned Assets'); ?></h3>
-            </div>
+<!-- Optional: My Assets (if assigned) -->
+<?php if (mysqli_num_rows($sql_assigned_assets) > 0) { ?>
+<div class="row mt-4">
+    <div class="col-12">
+        <h5 class="mb-3" style="font-weight: 600; color: var(--gray-700);">
+            <i class="fas fa-desktop mr-2"></i><?php echo __('client_portal_your_assigned_assets', 'Mir zugewiesene Assets'); ?>
+        </h5>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-soft">
             <div class="card-body">
-                <div class="list-group list-group-flush">
                 <?php
-
                 while ($row = mysqli_fetch_array($sql_assigned_assets)) {
                     $asset_name = nullable_htmlentities($row['asset_name']);
                     $asset_type = nullable_htmlentities($row['asset_type']);
                     $asset_uri_client = sanitize_url($row['asset_uri_client']);
-
-
                     ?>
-                    <div class="mb-2 pb-2" style="border-bottom: 1px solid var(--gray-100);">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-3" style="border-bottom: 1px solid var(--gray-100);">
+                        <div>
+                            <h6 class="mb-0" style="color: var(--gray-800); font-weight: 600;">
                                 <?php if ($asset_uri_client) { ?>
-                                    <a href="<?= $asset_uri_client ?>" target="_blank" style="color: var(--primary-color);">
-                                        <i class='fas fa-external-link-alt mr-2'></i>
-                                    </a>
+                                <a href="<?= $asset_uri_client ?>" target="_blank" style="color: var(--primary-color); text-decoration: none;">
+                                    <i class='fas fa-external-link-alt mr-2'></i>
+                                </a>
                                 <?php } ?>
-                                <strong style="color: var(--gray-800);"><?php echo $asset_name; ?></strong>
-                            </div>
+                                <?php echo $asset_name; ?>
+                            </h6>
+                            <small class="text-muted"><i class="fas fa-tag mr-1"></i><?php echo $asset_type; ?></small>
                         </div>
-                        <small class="text-muted ml-4"><i class="fas fa-tag mr-1"></i><?php echo $asset_type; ?></small>
                     </div>
                     <?php
                 }
                 ?>
-                </div>
             </div>
-        </a>
+        </div>
     </div>
-    <?php } ?>
 </div>
+<?php } ?>
 
 <?php require_once "includes/footer.php"; ?>

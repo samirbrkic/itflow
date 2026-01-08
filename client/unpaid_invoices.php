@@ -6,7 +6,7 @@
 
 $bulk_payment_enabled = 0; // Not Yet Enabled
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
 
 require_once "includes/inc_all.php";
 
