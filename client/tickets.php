@@ -42,7 +42,7 @@ $total_tickets = intval($row['total_tickets']);
 
 ?>
 
-<h3>Tickets</h3>
+<h3><?php echo __('client_portal_tickets', 'Tickets'); ?></h3>
 <div class="row">
 
     <div class="col-md-10">
@@ -51,8 +51,8 @@ $total_tickets = intval($row['total_tickets']);
             <thead class="thead-dark">
                 <tr>
                     <th>#</th>
-                    <th>Subject</th>
-                    <th>Status</th>
+                    <th><?php echo __('client_portal_ticket_subject', 'Subject'); ?></th>
+                    <th><?php echo __('client_portal_ticket_status', 'Status'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -85,22 +85,22 @@ $total_tickets = intval($row['total_tickets']);
 
     <div class="col-md-2">
 
-        <a href="ticket_add.php" class="btn btn-primary btn-block">New ticket</a>
+        <a href="ticket_add.php" class="btn btn-primary btn-block"><?php echo __('client_portal_new_ticket', 'New ticket'); ?></a>
 
         <hr>
 
-        <a href="?status=Open" class="btn btn-danger btn-block p-3 mb-3 text-left">My Open tickets | <strong><?php echo $total_tickets_open ?></strong></a>
+        <a href="?status=Open" class="btn btn-danger btn-block p-3 mb-3 text-left"><?php echo __('client_portal_ticket_open', 'My Open tickets'); ?> | <strong><?php echo $total_tickets_open ?></strong></a>
 
-        <a href="?status=Closed" class="btn btn-success btn-block p-3 mb-3 text-left">Closed tickets | <strong><?php echo $total_tickets_closed ?></strong></a>
+        <a href="?status=Closed" class="btn btn-success btn-block p-3 mb-3 text-left"><?php echo __('client_portal_ticket_closed', 'Closed tickets'); ?> | <strong><?php echo $total_tickets_closed ?></strong></a>
 
-        <a href="?status=%" class="btn btn-secondary btn-block p-3 mb-3 text-left">All my tickets | <strong><?php echo $total_tickets ?></strong></a>
+        <a href="?status=%" class="btn btn-secondary btn-block p-3 mb-3 text-left"><?php echo __('client_portal_tickets', 'All my tickets'); ?> | <strong><?php echo $total_tickets ?></strong></a>
         <?php
         if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
         ?>
 
         <hr>
 
-        <a href="ticket_view_all.php" class="btn btn-dark btn-block p-2 mb-3">All Tickets</a>
+        <a href="ticket_view_all.php" class="btn btn-dark btn-block p-2 mb-3"><?php echo __('client_portal_all_tickets', 'All Tickets'); ?></a>
 
         <?php
         }
