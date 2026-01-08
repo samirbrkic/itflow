@@ -15,6 +15,11 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
+// Initialize i18n (internationalization) system for client portal
+if (function_exists('i18n_init')) {
+    i18n_init();
+}
+
 if (!isset($_SESSION['client_logged_in']) || !$_SESSION['client_logged_in']) {
     header("Location: /login.php");
     die;
