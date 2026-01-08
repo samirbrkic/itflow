@@ -121,3 +121,15 @@ $lang['ticket_created_success'] = 'Ticket erfolgreich erstellt';
 $lang['ticket_updated_success'] = 'Ticket erfolgreich aktualisiert';
 $lang['ticket_closed_success'] = 'Ticket erfolgreich geschlossen';
 $lang['ticket_deleted_success'] = 'Ticket erfolgreich gelöscht';
+
+// Ticket Status Translations
+$lang['ticket_status_new'] = 'Neu';
+$lang['ticket_status_open'] = 'Offen';
+$lang['ticket_status_on_hold'] = 'Wartend';
+$lang['ticket_status_resolved'] = 'Gelöst';
+$lang['ticket_status_closed'] = 'Geschlossen';
+$lang['ticket_status_in_progress'] = 'In Bearbeitung';
+$lang['ticket_status_pending'] = 'Ausstehend';
+$lang['ticket_status_waiting'] = 'Wartend';
+$lang['ticket_status_cancelled'] = 'Abgebrochen';
+$lang['ticket_status_assigned'] = 'Zugewiesen';

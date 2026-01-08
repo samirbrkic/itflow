@@ -16,26 +16,31 @@ if ($session_contact_primary == 0 && !$session_contact_is_technical_contact) {
 $documents_sql = mysqli_query($mysqli, "SELECT document_id, document_name, document_created_at, folder_name FROM documents LEFT JOIN folders ON document_folder_id = folder_id WHERE document_client_visible = 1 AND document_client_id = $session_client_id AND document_archived_at IS NULL ORDER BY folder_id, document_name DESC");
 ?>
 
-<div class="row">
+<div class="row mb-4 align-items-center">
     <div class="col">
-        <h3><i class="fas fa-file-alt mr-2"></i><?php echo __('client_portal_documents', 'Documents'); ?></h3>
+        <div class="d-flex align-items-center">
+            <div class="mr-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #8B5CF6, #6366F1); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+                <i class="fas fa-file-alt fa-lg text-white"></i>
+            </div>
+            <h2 class="mb-0" style="font-weight: 700; color: var(--gray-800);"><?php echo __('client_portal_documents', 'Documents'); ?></h2>
+        </div>
     </div>
     <div class="col-auto">
-        <div class="btn-group">
+        <div class="btn-group shadow-soft">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadDocumentModal">
-                <i class="fas fa-plus mr-2"></i><?php echo __('client_portal_document_name', 'New Document'); ?>
+                <i class="fas fa-plus-circle mr-2"></i><?php echo __('client_portal_document_name', 'New Document'); ?>
             </button>
             <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#uploadFileDocumentModal">
-                <i class="fas fa-upload mr-2"></i><?php echo __('client_portal_action_upload', 'Upload File'); ?>
+                <i class="fas fa-cloud-upload-alt mr-2"></i><?php echo __('client_portal_action_upload', 'Upload File'); ?>
             </button>
         </div>
     </div>
 </div>
 
-<div class="row mt-3">
+<div class="row">
     <div class="col-md-12">
-        <table class="table table-bordered border border-dark">
-            <thead class="thead-dark">
+        <table class="table shadow-soft rounded-modern">
+            <thead>
             <tr>
                 <th><?php echo __('client_portal_document_name', 'Name'); ?></th>
                 <th><?php echo __('client_portal_ticket_created', 'Created'); ?></th>
@@ -55,20 +60,20 @@ $documents_sql = mysqli_query($mysqli, "SELECT document_id, document_name, docum
 
                 <tr>
                     <td>
-                        <a href="document.php?id=<?php echo $document_id?>">
-                            <i class="fas fa-file-alt mr-2"></i>
+                        <a href="document.php?id=<?php echo $document_id?>" style="color: var(--gray-800); font-weight: 500;">
+                            <i class="fas fa-file-alt mr-2" style="color: var(--accent-purple);"></i>
                             <?php
                             if (!empty($folder_name)) {
-                                echo "$folder_name / ";
+                                echo "<span style='color: var(--gray-500);'>$folder_name / </span>";
                             }
                             echo $document_name;
                             ?>
                         </a>
                     </td>
-                    <td><?php echo date('M j, Y', strtotime($document_created_at)); ?></td>
+                    <td style="color: var(--gray-600);"><i class="fas fa-calendar-plus mr-1"></i><?php echo date('M j, Y', strtotime($document_created_at)); ?></td>
                     <td class="text-center">
-                        <a href="document.php?id=<?php echo $document_id?>" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-eye"></i>
+                        <a href="document.php?id=<?php echo $document_id?>" class="btn btn-sm btn-primary" style="border-radius: var(--radius-md);">
+                            <i class="fas fa-eye mr-1"></i>View
                         </a>
                     </td>
                 </tr>

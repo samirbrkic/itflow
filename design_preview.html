@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ITFlow Client Portal - Modern Design Preview</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/plugins/adminlte/css/adminlte.min.css">
+    
+    <!-- Modern Custom Styles -->
+    <link rel="stylesheet" href="/css/itflow_custom.css">
+</head>
+
+<body class="modern-portal">
+
+<!-- Modern Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-ticket-alt mr-2"></i>Your Company Name
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Tickets</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                        Finance
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#"><i class="fas fa-file-invoice mr-2"></i>Invoices</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-sync-alt mr-2"></i>Recurring Invoices</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-file-alt mr-2"></i>Quotes</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                        Technical
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#"><i class="fas fa-users mr-2"></i>Contacts</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-desktop mr-2"></i>Assets</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-file-alt mr-2"></i>Documents</a>
+                        <a class="dropdown-item" href="#"><i class="fas fa-globe mr-2"></i>Domains</a>
+                    </div>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                        John Doe
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#"><i class="fas fa-user mr-2"></i>Account</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt mr-2"></i>Sign out</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<br>
+
+<!-- Content Container -->
+<div class="container">
+
+    <!-- Welcome Section -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-1 text-center">
+            <span class="fa-stack fa-3x">
+                <i class="fa fa-circle fa-stack-2x" style="color: var(--primary-color);"></i>
+                <span class="fa fa-stack-1x text-white" style="font-weight: 700;">JD</span>
+            </span>
+        </div>
+        <div class="col-md-11 p-0">
+            <h3 class="mb-1">
+                <span class="text-gradient">Welcome</span>, <strong>John Doe</strong>! 👋
+            </h3>
+            <p class="text-muted mb-0"><i class="fas fa-building mr-2"></i>Your Company Name</p>
+        </div>
+    </div>
+
+    <!-- New Ticket Button -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <a href="#" class="btn btn-primary btn-lg btn-block shadow-soft">
+                <i class="fas fa-plus-circle mr-2"></i>New ticket
+            </a>
+        </div>
+    </div>
+
+    <!-- Dashboard Cards - Billing -->
+    <div class="row mb-4">
+        <div class="col-sm-3">
+            <a href="#" class="card text-dark">
+                <div class="card-header" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
+                    <h3 class="card-title"><i class="fas fa-exclamation-circle mr-2"></i>Account Balance</h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="h4 text-danger mb-0"><b>$2,450.00</b></div>
+                    <small class="text-muted"><i class="fas fa-arrow-right mr-1"></i>View unpaid invoices</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-sm-3">
+            <a href="#" class="card text-dark">
+                <div class="card-header" style="background: linear-gradient(135deg, #10B981, #059669);">
+                    <h3 class="card-title"><i class="fas fa-sync-alt mr-2"></i>Recurring Monthly</h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="h4 mb-0" style="color: var(--success-color);"><b>$499.00</b></div>
+                    <small class="text-muted"><i class="fas fa-calendar-alt mr-1"></i>Per month</small>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-sm-3">
+            <a href="#" class="card text-dark">
+                <div class="card-header" style="background: linear-gradient(135deg, #3B82F6, #14B8A6);">
+                    <h3 class="card-title"><i class="fas fa-globe mr-2"></i>Domains Expiring</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-clock text-warning mr-2"></i>
+                            <strong style="color: var(--gray-800);">example.com</strong>
+                        </div>
+                        <small class="text-muted"><i class="fas fa-calendar mr-1"></i>2026-03-15 (in 66 days)</small>
+                    </div>
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="fas fa-clock text-warning mr-2"></i>
+                            <strong style="color: var(--gray-800);">mysite.net</strong>
+                        </div>
+                        <small class="text-muted"><i class="fas fa-calendar mr-1"></i>2026-04-20 (in 102 days)</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-sm-3">
+            <a href="#" class="card text-dark">
+                <div class="card-header" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">
+                    <h3 class="card-title"><i class="fas fa-desktop mr-2"></i>Your Assigned Assets</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2 pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong style="color: var(--gray-800);">MacBook Pro 2024</strong>
+                            </div>
+                        </div>
+                        <small class="text-muted ml-0"><i class="fas fa-tag mr-1"></i>Laptop</small>
+                    </div>
+                    <div class="mb-2 pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <strong style="color: var(--gray-800);">iPhone 15 Pro</strong>
+                            </div>
+                        </div>
+                        <small class="text-muted ml-0"><i class="fas fa-tag mr-1"></i>Mobile Device</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Tickets Section -->
+    <div class="d-flex align-items-center mb-4">
+        <div class="mr-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary-color), var(--accent-purple)); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+            <i class="fas fa-ticket-alt fa-lg text-white"></i>
+        </div>
+        <h2 class="mb-0 text-gradient" style="font-weight: 700;">My Tickets</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table shadow-soft rounded-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-hashtag mr-1"></i>TKT-001234
+                            </a>
+                        </td>
+                        <td><a href="#" style="color: var(--gray-800);">Email not working on mobile device</a></td>
+                        <td><span class="badge badge-warning">Open</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-hashtag mr-1"></i>TKT-001233
+                            </a>
+                        </td>
+                        <td><a href="#" style="color: var(--gray-800);">Password reset request</a></td>
+                        <td><span class="badge badge-success">Resolved</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-hashtag mr-1"></i>TKT-001232
+                            </a>
+                        </td>
+                        <td><a href="#" style="color: var(--gray-800);">VPN connection issues</a></td>
+                        <td><span class="badge badge-primary">In Progress</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-hashtag mr-1"></i>TKT-001231
+                            </a>
+                        </td>
+                        <td><a href="#" style="color: var(--gray-800);">Printer setup assistance needed</a></td>
+                        <td><span class="badge badge-success">Closed</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-2">
+            <a href="#" class="btn btn-primary btn-block btn-lg mb-3 shadow-soft">
+                <i class="fas fa-plus-circle mr-2"></i>New ticket
+            </a>
+
+            <hr style="border-color: var(--gray-200);">
+
+            <a href="#" class="btn btn-danger btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+                <i class="fas fa-folder-open mr-2"></i>My Open tickets
+                <div class="float-right" style="font-size: 1.25rem; font-weight: 700;">8</div>
+            </a>
+
+            <a href="#" class="btn btn-success btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+                <i class="fas fa-check-circle mr-2"></i>Closed tickets
+                <div class="float-right" style="font-size: 1.25rem; font-weight: 700;">124</div>
+            </a>
+
+            <a href="#" class="btn btn-secondary btn-block p-3 mb-3 text-left shadow-soft" style="border-radius: var(--radius-lg);">
+                <i class="fas fa-list mr-2"></i>All my tickets
+                <div class="float-right" style="font-size: 1.25rem; font-weight: 700;">132</div>
+            </a>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Invoices Section -->
+    <div class="d-flex align-items-center mb-4">
+        <div class="mr-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #10B981, #059669); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+            <i class="fas fa-file-invoice-dollar fa-lg text-white"></i>
+        </div>
+        <h2 class="mb-0" style="font-weight: 700; color: var(--gray-800);">Recent Invoices</h2>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <table class="table shadow-soft rounded-modern">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Scope</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Due</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-file-invoice mr-1"></i>INV-2026-001
+                            </a>
+                        </td>
+                        <td style="color: var(--gray-700);">Monthly IT Support - January 2026</td>
+                        <td style="font-weight: 600; color: var(--gray-800);">$1,299.00</td>
+                        <td style="color: var(--gray-600);"><i class="fas fa-calendar mr-1"></i>Jan 1, 2026</td>
+                        <td><i class="fas fa-clock mr-1"></i>Jan 15, 2026</td>
+                        <td><span class="badge badge-warning">Sent</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-file-invoice mr-1"></i>INV-2025-152
+                            </a>
+                        </td>
+                        <td style="color: var(--gray-700);">Monthly IT Support - December 2025</td>
+                        <td style="font-weight: 600; color: var(--gray-800);">$1,299.00</td>
+                        <td style="color: var(--gray-600);"><i class="fas fa-calendar mr-1"></i>Dec 1, 2025</td>
+                        <td><i class="fas fa-clock mr-1"></i>Dec 15, 2025</td>
+                        <td><span class="badge badge-success">Paid</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="#" style="color: var(--primary-color); font-weight: 600;">
+                                <i class="fas fa-file-invoice mr-1"></i>INV-2025-151
+                            </a>
+                        </td>
+                        <td style="color: var(--gray-700);">Server Migration Project</td>
+                        <td style="font-weight: 600; color: var(--gray-800);">$4,500.00</td>
+                        <td style="color: var(--gray-600);"><i class="fas fa-calendar mr-1"></i>Nov 20, 2025</td>
+                        <td><i class="fas fa-clock mr-1"></i>Dec 5, 2025</td>
+                        <td><span class="badge badge-success">Paid</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modern Footer -->
+<footer class="mt-5 py-4" style="background: linear-gradient(135deg, var(--gray-50), var(--gray-100)); border-top: 1px solid var(--gray-200);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-center text-md-left">
+                <p class="mb-2" style="font-weight: 600; color: var(--gray-800);">
+                    <i class="fas fa-building mr-2" style="color: var(--primary-color);"></i>Your Company Name
+                </p>
+                <small class="text-muted">
+                    <i class="fas fa-heart mr-1" style="color: var(--danger-color);"></i>Powered by <a href="https://itflow.org" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">ITFlow</a>
+                </small>
+            </div>
+            <div class="col-md-6 text-center text-md-right">
+                <small class="text-muted">
+                    <i class="fas fa-shield-alt mr-1" style="color: var(--success-color);"></i>Secure Portal
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-clock mr-1"></i>2026
+                </small>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/plugins/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

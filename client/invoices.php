@@ -17,13 +17,18 @@ if ($session_contact_primary == 0 && !$session_contact_is_billing_contact) {
 $invoices_sql = mysqli_query($mysqli, "SELECT * FROM invoices WHERE invoice_client_id = $session_client_id AND invoice_status != 'Draft' ORDER BY invoice_date DESC");
 ?>
 
-<h3><?php echo __('client_portal_invoices', 'Invoices'); ?></h3>
+<div class="d-flex align-items-center mb-4">
+    <div class="mr-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #10B981, #059669); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);">
+        <i class="fas fa-file-invoice-dollar fa-lg text-white"></i>
+    </div>
+    <h2 class="mb-0" style="font-weight: 700; color: var(--gray-800);"><?php echo __('client_portal_invoices', 'Invoices'); ?></h2>
+</div>
 <div class="row">
 
     <div class="col-md-10">
 
-        <table class="table tabled-bordered border border-dark">
-            <thead class="thead-dark">
+        <table class="table shadow-soft rounded-modern">
+            <thead>
             <tr>
                 <th>#</th>
                 <th><?php echo __('client_portal_ticket_subject', 'Scope'); ?></th>
@@ -76,13 +81,19 @@ $invoices_sql = mysqli_query($mysqli, "SELECT * FROM invoices WHERE invoice_clie
                 ?>
 
                 <tr>
-                    <td><a target="_blank" href="//<?php echo $config_base_url ?>/guest/guest_view_invoice.php?invoice_id=<?php echo "$invoice_id&url_key=$invoice_url_key"?>"> <?php echo "$invoice_prefix$invoice_number"; ?></a></td>
-                    <td><?php echo $invoice_scope_display; ?></td>
-                    <td><?php echo numfmt_format_currency($currency_format, $invoice_amount, $session_company_currency); ?></td>
-                    <td><?php echo $invoice_date; ?></td>
-                    <td class="<?php echo $overdue_color; ?>"><?php echo $invoice_due; ?></td>
                     <td>
-                        <span class="p-2 badge badge-<?php echo $invoice_badge_color; ?>">
+                        <a target="_blank" href="//<?php echo $config_base_url ?>/guest/guest_view_invoice.php?invoice_id=<?php echo "$invoice_id&url_key=$invoice_url_key"?>" style="color: var(--primary-color); font-weight: 600;">
+                            <i class="fas fa-file-invoice mr-1"></i><?php echo "$invoice_prefix$invoice_number"; ?>
+                        </a>
+                    </td>
+                    <td style="color: var(--gray-700);"><?php echo $invoice_scope_display; ?></td>
+                    <td style="font-weight: 600; color: var(--gray-800);"><?php echo numfmt_format_currency($currency_format, $invoice_amount, $session_company_currency); ?></td>
+                    <td style="color: var(--gray-600);"><i class="fas fa-calendar mr-1"></i><?php echo $invoice_date; ?></td>
+                    <td class="<?php echo $overdue_color; ?>">
+                        <i class="fas fa-clock mr-1"></i><?php echo $invoice_due; ?>
+                    </td>
+                    <td>
+                        <span class="badge badge-<?php echo $invoice_badge_color; ?>">
                             <?php echo $invoice_status; ?>
                         </span>
                     </td>

@@ -29,13 +29,20 @@ header("X-Frame-Options: DENY"); // Legacy
     <!-- Theme style -->
     <link rel="stylesheet" href="/plugins/adminlte/css/adminlte.min.css">
 
+    <!-- Modern Custom Styles -->
+    <link rel="stylesheet" href="/css/itflow_custom.css">
+
 </head>
+
+<body class="modern-portal">
 
 <!-- Navbar -->
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="index.php"><?php echo nullable_htmlentities($session_company_name); ?></a>
+        <a class="navbar-brand" href="index.php">
+            <i class="fas fa-ticket-alt mr-2"></i><?php echo nullable_htmlentities($session_company_name); ?>
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -128,24 +135,25 @@ header("X-Frame-Options: DENY"); // Legacy
 <!-- Page content container -->
 <div class="container">
 
-    <div class="row mb-3">
-        <div class="col-md-1 text-center">
+    <div class="row mb-4 align-items-center">
+        <div class="col-auto text-center pr-3">
             <?php if (!empty($session_contact_photo)) { ?>
-                <img src="/uploads/clients/<?= $session_client_id ?>/<?= $session_contact_photo ?>" alt="..." height="50" width="50" class="img-circle img-responsive">
+                <img src="/uploads/clients/<?= $session_client_id ?>/<?= $session_contact_photo ?>" alt="..." height="60" width="60" class="img-circle img-responsive">
 
             <?php } else { ?>
-                <span class="fa-stack fa-2x rounded-left">
-                    <i class="fa fa-circle fa-stack-2x text-secondary"></i>
-                    <span class="fa fa-stack-1x text-white"><?php echo $session_contact_initials; ?></span>
+                <span class="fa-stack fa-3x">
+                    <i class="fa fa-circle fa-stack-2x" style="color: var(--primary-color);"></i>
+                    <span class="fa fa-stack-1x text-white" style="font-weight: 700;"><?php echo $session_contact_initials; ?></span>
                 </span>
             <?php } ?>
         </div>
 
-        <div class="col-md-11 p-0">
+        <div class="col">
                 <?php if ($session_company_logo) { ?>
-                    <img height="48" width="142" class="img-fluid float-right" src="<?php echo "/uploads/settings/$session_company_logo"; ?>">
+                    <img height="48" width="142" class="img-fluid float-right" src="<?php echo "/uploads/settings/$session_company_logo"; ?>" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
                 <?php } ?>
-            <h4><?php echo __('client_portal_welcome', 'Welcome'); ?>, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h4>
+            <h3 class="mb-1"><span class="text-gradient"><?php echo __('client_portal_welcome', 'Welcome'); ?></span>, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h3>
+            <p class="text-muted mb-0"><i class="fas fa-building mr-2"></i><?php echo nullable_htmlentities($session_client_name); ?></p>
         </div>
     </div>
     <hr>
