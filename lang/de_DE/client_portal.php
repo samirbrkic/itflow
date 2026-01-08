@@ -230,7 +230,36 @@ $lang['client_portal_frequency_year'] = 'Jährlich';
 $lang['client_portal_frequency_week'] = 'Wöchentlich';
 $lang['client_portal_frequency_quarter'] = 'Vierteljährlich';
 
+// Dashboard
+$lang['client_portal_dashboard'] = 'Dashboard';
+$lang['client_portal_welcome_overview'] = 'Willkommen zur Übersicht';
+$lang['client_portal_all_company_tickets'] = 'Alle Tickets der Firma';
+$lang['client_portal_my_tickets'] = 'Meine Tickets';
+$lang['client_portal_recent_updates'] = 'Letzte Ticket-Updates';
+$lang['client_portal_support_contact'] = 'Support kontaktieren';
+$lang['client_portal_quick_links'] = 'Schnellzugriff';
+$lang['client_portal_support_hours'] = 'Supportzeiten';
+$lang['client_portal_financial_overview'] = 'Finanzübersicht';
+
+// Ticket Statistics
+$lang['client_portal_open_tickets'] = 'Offen';
+$lang['client_portal_in_progress'] = 'In Bearbeitung';
+$lang['client_portal_resolved_today'] = 'Heute gelöst';
+$lang['client_portal_total_tickets'] = 'Gesamt';
+
+// Pagination & Search
+$lang['client_portal_per_page'] = 'Pro Seite';
+$lang['client_portal_show_all'] = 'Alle anzeigen';
+$lang['client_portal_page'] = 'Seite';
+$lang['client_portal_next'] = 'Weiter';
+$lang['client_portal_previous'] = 'Zurück';
+$lang['client_portal_search_placeholder'] = 'Tickets durchsuchen...';
+$lang['client_portal_no_tickets_found'] = 'Keine Tickets gefunden';
+$lang['client_portal_view_all'] = 'Alle anzeigen';
+
 // Other
+$lang['client_portal_contact'] = 'Kontakt';
+$lang['client_portal_any'] = 'Alle';
 $lang['client_portal_loading'] = 'Lädt...';
 $lang['client_portal_no_results'] = 'Keine Ergebnisse gefunden';
 $lang['client_portal_showing'] = 'Zeige';
