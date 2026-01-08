@@ -807,3 +807,30 @@ hr {
         border: 1px solid var(--gray-300) !important;
     }
 }
+
+/* Footer Links */
+.footer-link {
+    color: var(--gray-600);
+    text-decoration: none;
+    font-weight: 500;
+    margin-right: 1rem;
+    transition: var(--transition-fast);
+}
+
+.footer-link:hover {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+/* Dashboard Ticket Items */
+.ticket-item {
+    background: white;
+}
+
+.ticket-item:hover {
+    background: var(--gray-50) !important;
+}
+
+.ticket-link:hover {
+    text-decoration: underline !important;
+}

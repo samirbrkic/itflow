@@ -4,7 +4,10 @@
  * Tickets Page with Pagination & Search
  */
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
+
+// AJAX mode for live search
+$ajax_mode = isset($_GET['ajax']) && $_GET['ajax'] == '1';
 
 require_once "includes/inc_all.php";
 
@@ -81,29 +84,38 @@ if (!isset($_GET['status']) || ($_GET['status']) == 'Open') {
 }
 
 // ========================================
-// SEARCH WHERE CLAUSE
+// SEARCH WHERE CLAUSE (Extended)
 // ========================================
 
 $search_where = '';
 if (!empty($search_query)) {
-    $search_where = "AND (CONCAT(ticket_prefix, ticket_number) LIKE '%$search_query%' 
-        OR ticket_subject LIKE '%$search_query%' 
-        OR ticket_status_name LIKE '%$search_query%')";
+    $search_where = "AND (
+        CONCAT(tickets.ticket_prefix, tickets.ticket_number) LIKE '%$search_query%' 
+        OR tickets.ticket_subject LIKE '%$search_query%' 
+        OR tickets.ticket_details LIKE '%$search_query%'
+        OR ticket_status_name LIKE '%$search_query%'
+        OR contacts.contact_name LIKE '%$search_query%'
+        OR EXISTS (
+            SELECT 1 FROM ticket_replies 
+            WHERE ticket_replies.ticket_reply_ticket_id = tickets.ticket_id 
+            AND ticket_replies.ticket_reply LIKE '%$search_query%'
+        )
+    )";
 }
 
 // ========================================
 // TICKETS QUERY WITH PAGINATION
 // ========================================
 
-$contact_tickets = mysqli_query($mysqli, "SELECT SQL_CALC_FOUND_ROWS ticket_id, ticket_prefix, ticket_number, ticket_subject, ticket_status_name 
+$contact_tickets = mysqli_query($mysqli, "SELECT SQL_CALC_FOUND_ROWS tickets.ticket_id, tickets.ticket_prefix, tickets.ticket_number, tickets.ticket_subject, ticket_status_name 
     FROM tickets 
-    LEFT JOIN contacts ON ticket_contact_id = contact_id 
-    LEFT JOIN ticket_statuses ON ticket_status = ticket_status_id 
+    LEFT JOIN contacts ON tickets.ticket_contact_id = contacts.contact_id 
+    LEFT JOIN ticket_statuses ON tickets.ticket_status = ticket_statuses.ticket_status_id 
     WHERE $ticket_status_snippet 
-    AND ticket_contact_id = $session_contact_id 
-    AND ticket_client_id = $session_client_id 
+    AND tickets.ticket_contact_id = $session_contact_id 
+    AND tickets.ticket_client_id = $session_client_id 
     $search_where
-    ORDER BY ticket_id DESC 
+    ORDER BY tickets.ticket_id DESC 
     LIMIT $record_from, $record_to");
 
 // Get total count for pagination
@@ -173,13 +185,18 @@ function buildQueryString($exclude = []) {
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
                         </div>
-                        <input type="text" name="q" class="form-control" placeholder="<?php echo __('client_portal_search_placeholder', 'Tickets durchsuchen...'); ?>" value="<?php echo htmlentities($search_query); ?>">
+                        <input type="text" name="q" id="searchInput" class="form-control" placeholder="<?php echo __('client_portal_search_placeholder', 'Tickets durchsuchen...'); ?>" value="<?php echo htmlentities($search_query); ?>">
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="searchSpinner" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </div>
                     </div>
                     
                     <!-- Records per page Dropdown -->
                     <div class="form-group mr-3 mb-2">
                         <label class="mr-2 mb-0" style="font-weight: 600;"><?php echo __('client_portal_per_page', 'Pro Seite'); ?>:</label>
-                        <select name="records" class="form-control" onchange="this.form.submit()" style="width: auto;">
+                        <select name="records" id="recordsSelect" class="form-control" style="width: auto;">
                             <option value="20" <?php if ($records_per_page == 20) echo 'selected'; ?>>20</option>
                             <option value="50" <?php if ($records_per_page == 50) echo 'selected'; ?>>50</option>
                             <option value="100" <?php if ($records_per_page == 100) echo 'selected'; ?>>100</option>
@@ -187,8 +204,8 @@ function buildQueryString($exclude = []) {
                         </select>
                     </div>
                     
-                    <!-- Search Button -->
-                    <button type="submit" class="btn btn-primary mb-2">
+                    <!-- Search Button (optional, kept for manual search) -->
+                    <button type="submit" class="btn btn-primary mb-2" style="opacity: 0.7;">
                         <i class="fas fa-search mr-2"></i><?php echo __('client_portal_action_search', 'Suchen'); ?>
                     </button>
                     
@@ -209,6 +226,7 @@ function buildQueryString($exclude = []) {
     <!-- Tickets Table -->
     <div class="col-md-10">
         
+        <div id="ticketsContent">
         <!-- Results Info -->
         <?php if ($total_found_tickets > 0) { ?>
         <div class="mb-3">
@@ -334,6 +352,7 @@ function buildQueryString($exclude = []) {
             </ul>
         </nav>
         <?php } ?>
+        </div><!-- #ticketsContent -->
 
     </div>
 
@@ -371,5 +390,8 @@ function buildQueryString($exclude = []) {
 
     </div>
 </div>
+
+<!-- Live Search Script -->
+<script src="../js/client_ticket_search.js"></script>
 
 <?php require_once "includes/footer.php"; ?>

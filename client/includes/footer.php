@@ -19,13 +19,13 @@
                     <i class="fas fa-building mr-2" style="color: var(--primary-color);"></i><?php echo nullable_htmlentities($session_company_name); ?>
                 </p>
                 <div class="footer-links">
-                    <a href="https://samix.one/legal/imprint" target="_blank" rel="noopener noreferrer" style="color: var(--gray-600); text-decoration: none; font-weight: 500; margin-right: 1rem; transition: var(--transition-fast);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--gray-600)'">
+                    <a href="https://samix.one/legal/imprint" target="_blank" rel="noopener noreferrer" class="footer-link">
                         <i class="fas fa-info-circle mr-1"></i>Impressum
                     </a>
-                    <a href="https://samix.one/legal/privacy" target="_blank" rel="noopener noreferrer" style="color: var(--gray-600); text-decoration: none; font-weight: 500; margin-right: 1rem; transition: var(--transition-fast);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--gray-600)'">
+                    <a href="https://samix.one/legal/privacy" target="_blank" rel="noopener noreferrer" class="footer-link">
                         <i class="fas fa-shield-alt mr-1"></i>Datenschutz
                     </a>
-                    <a href="https://samix.one/legal/terms" target="_blank" rel="noopener noreferrer" style="color: var(--gray-600); text-decoration: none; font-weight: 500; transition: var(--transition-fast);" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--gray-600)'">
+                    <a href="https://samix.one/legal/terms" target="_blank" rel="noopener noreferrer" class="footer-link">
                         <i class="fas fa-file-contract mr-1"></i>AGB
                     </a>
                 </div>
@@ -52,39 +52,7 @@
 
 <!--- TinyMCE -->
 <script src="/plugins/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
-
-<script>
-    
-    // Initialize TinyMCE
-    tinymce.init({
-        selector: '.tinymce',
-        browser_spellcheck: true,
-        resize: true,
-        min_height: 300,
-        max_height: 600,
-        promotion: false,
-        branding: false,
-        menubar: false,
-        statusbar: false,
-        license_key: 'gpl',
-        toolbar: [
-            { name: 'styles', items: [ 'styles' ] },
-            { name: 'formatting', items: [ 'bold', 'italic', 'forecolor' ] },
-            { name: 'lists', items: [ 'bullist', 'numlist' ] },
-            { name: 'alignment', items: [ 'alignleft', 'aligncenter', 'alignright', 'alignjustify' ] },
-            { name: 'indentation', items: [ 'outdent', 'indent' ] },
-            { name: 'table', items: [ 'table' ] },
-            { name: 'extra', items: [ 'fullscreen' ] }
-        ],
-        mobile: {
-        menubar: false,
-        plugins: 'autosave lists autolink',
-        toolbar: 'undo bold italic styles',
-    },
-        plugins: 'link image lists table code codesample fullscreen autoresize',
-    });
-
-</script>
+<script src="/js/tinymce_init.js"></script>
 
 <script src="/js/pretty_content.js"></script>
 

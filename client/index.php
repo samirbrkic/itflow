@@ -4,7 +4,7 @@
  * Landing / Home page - Modern Dashboard with Ticket Overview
  */
 
-header("Content-Security-Policy: default-src 'self'");
+header("Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'");
 
 require_once "includes/inc_all.php";
 
@@ -296,11 +296,11 @@ $sql_assigned_assets = mysqli_query($mysqli, "SELECT * FROM assets WHERE asset_c
                         
                         $time_ago = timeAgo($ticket_updated_at);
                         ?>
-                        <div class="p-3" style="border-bottom: 1px solid var(--gray-100); transition: var(--transition-fast);" onmouseover="this.style.background='var(--gray-50)'" onmouseout="this.style.background='white'">
+                        <div class="p-3 ticket-item" style="border-bottom: 1px solid var(--gray-100); transition: var(--transition-fast);">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-2">
-                                        <a href="ticket.php?id=<?php echo $ticket_id; ?>" style="color: var(--primary-color); font-weight: 600; text-decoration: none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                        <a href="ticket.php?id=<?php echo $ticket_id; ?>" class="ticket-link" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
                                             <i class="fas fa-hashtag mr-1"></i><?php echo $ticket_prefix . $ticket_number; ?>
                                         </a>
                                         <span class="badge <?php echo $badge_class; ?> ml-2"><?php echo $ticket_status; ?></span>
