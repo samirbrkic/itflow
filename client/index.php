@@ -170,7 +170,7 @@ $sql_assigned_assets = mysqli_query(
 ?>
 <div class="row">
     <div class="col-md-2">
-        <a href="ticket_add.php" class="btn btn-primary btn-block mb-3">New ticket</a>
+        <a href="ticket_add.php" class="btn btn-primary btn-block mb-3"><?php echo __('client_portal_new_ticket', 'New ticket'); ?></a>
     </div>
 </div>
 <?php
@@ -183,7 +183,7 @@ if ($session_contact_primary == 1 || $session_contact_is_billing_contact) { ?>
     <div class="col-sm-3">
         <a href="unpaid_invoices.php" class="card">
             <div class="card-header">
-                <h3 class="card-title text-bold text-dark">Account Balance</h3>
+                <h3 class="card-title text-bold text-dark"><?php echo __('client_portal_account_balance', 'Account Balance'); ?></h3>
             </div>
             <div class="card-body">
                 <div class="h4 text-danger"><b><?php echo numfmt_format_currency($currency_format, $balance, $session_company_currency); ?></b></div>
@@ -196,7 +196,7 @@ if ($session_contact_primary == 1 || $session_contact_is_billing_contact) { ?>
     <div class="col-sm-3">
         <a href="recurring_invoices.php" class="card text-dark">
             <div class="card-header">
-                <h3 class="card-title">Recurring Monthly</h3>
+                <h3 class="card-title"><?php echo __('client_portal_recurring_monthly', 'Recurring Monthly'); ?></h3>
             </div>
             <div class="card-body">
                 <div class="h4"><b><?php echo numfmt_format_currency($currency_format, $recurring_monthly_total, $session_company_currency); ?></b></div>
@@ -221,7 +221,7 @@ if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
         <a href="domains.php">
             <div  class="card text-dark">
                 <div class="card-header">
-                    <h3 class="card-title text-bold"><i class="fas fa-fw fa-globe mr-2"></i>Domains Expiring</h3>
+                    <h3 class="card-title text-bold"><i class="fas fa-fw fa-globe mr-2"></i><?php echo __('client_portal_domains_expiring', 'Domains Expiring'); ?></h3>
                 </div>
                 <div class="card-body">
                     <?php
@@ -259,7 +259,7 @@ if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
     <div class="col-sm-3">
         <a href="assets.php" class="card text-dark">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-fw fa-desktop mr-2"></i>Your Assigned Assets</h3>
+                <h3 class="card-title"><i class="fas fa-fw fa-desktop mr-2"></i><?php echo __('client_portal_your_assigned_assets', 'Your Assigned Assets'); ?></h3>
             </div>
             <div class="card-body">
                 <table>

@@ -10,12 +10,12 @@ require_once 'includes/inc_all.php';
 
 ?>
 
-    <h2>Profile</h2>
+    <h2><?php echo __('client_portal_profile_title', 'Profile'); ?></h2>
 
-    <p>Name: <?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></p>
-    <p>Email: <?php echo $session_contact_email ?></p>
+    <p><?php echo __('client_portal_profile_name', 'Name'); ?>: <?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></p>
+    <p><?php echo __('client_portal_profile_email', 'Email'); ?>: <?php echo $session_contact_email ?></p>
     <p>PIN: <?php echo $session_contact_pin ?></p>
-    <p>Client: <?php echo $session_client_name ?></p>
+    <p><?php echo __('client_portal_contacts', 'Client'); ?>: <?php echo $session_client_name ?></p>
     <br>
     <p>Client Primary Contact: <?php if ($session_contact_primary == 1) {echo "Yes"; } else {echo "No";} ?></p>
     <p>Client Technical Contact: <?php if ($session_contact_is_technical_contact) {echo "Yes"; } else {echo "No";} ?></p>
@@ -29,10 +29,10 @@ require_once 'includes/inc_all.php';
 <?php if ($_SESSION['login_method'] == 'local'): ?>
     <hr>
     <div class="col-md-6">
-        <h4>Password</h4>
+        <h4><?php echo __('client_portal_profile_change_password', 'Password'); ?></h4>
         <form action="post.php" method="post" autocomplete="off">
             <div class="form-group">
-                <label>New Password</label>
+                <label><?php echo __('client_portal_profile_new_password', 'New Password'); ?></label>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
@@ -40,7 +40,7 @@ require_once 'includes/inc_all.php';
                     <input type="password" class="form-control" minlength="8" required data-toggle="password" name="new_password" placeholder="Leave blank for no change" autocomplete="new-password">
                 </div>
             </div>
-            <button type="submit" name="edit_profile" class="btn btn-primary text-bold mt-3"><i class="fas fa-check mr-2"></i>Save password</button>
+            <button type="submit" name="edit_profile" class="btn btn-primary text-bold mt-3"><i class="fas fa-check mr-2"></i><?php echo __('client_portal_profile_save', 'Save password'); ?></button>
         </form>
     </div>
 <?php endif ?>

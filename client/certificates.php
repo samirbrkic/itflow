@@ -16,7 +16,7 @@ if ($session_contact_primary == 0 && !$session_contact_is_technical_contact) {
 $certificates_sql = mysqli_query($mysqli, "SELECT certificate_id, certificate_name, certificate_domain, certificate_issued_by, certificate_expire FROM certificates WHERE certificate_client_id = $session_client_id AND certificate_archived_at IS NULL ORDER BY certificate_expire ASC");
 ?>
 
-    <h3>Web Certificates</h3>
+    <h3><?php echo __('client_portal_certificates', 'Web Certificates'); ?></h3>
     <div class="row">
 
         <div class="col-md-10">
@@ -24,10 +24,10 @@ $certificates_sql = mysqli_query($mysqli, "SELECT certificate_id, certificate_na
             <table class="table tabled-bordered border border-dark">
                 <thead class="thead-dark">
                 <tr>
-                    <th>Certificate Name</th>
-                    <th>FQDN</th>
-                    <th>Issuer</th>
-                    <th>Expiry</th>
+                    <th><?php echo __('client_portal_certificate_name', 'Certificate Name'); ?></th>
+                    <th><?php echo __('client_portal_certificate_domain', 'FQDN'); ?></th>
+                    <th><?php echo __('client_portal_certificate_issued_by', 'Issuer'); ?></th>
+                    <th><?php echo __('client_portal_certificate_expire', 'Expiry'); ?></th>
                 </tr>
                 </thead>
                 <tbody>

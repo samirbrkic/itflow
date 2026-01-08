@@ -58,7 +58,7 @@ if (!$stripe_public_key || !$stripe_secret_key) {
 }
 ?>
 
-<h3>Saved Payment Methods</h3>
+<h3><?php echo __('client_portal_saved_payments', 'Saved Payment Methods'); ?></h3>
 <hr>
 <div class="row">
     <div class="col-md-6">

@@ -12,7 +12,7 @@ header("X-Frame-Options: DENY"); // Legacy
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?php echo nullable_htmlentities($session_company_name); ?> | Client Portal</title>
+    <title><?php echo nullable_htmlentities($session_company_name); ?> | <?php echo __('client_portal_title', 'Client Portal'); ?></title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -43,22 +43,22 @@ header("X-Frame-Options: DENY"); // Legacy
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item <?php if (basename($_SERVER['PHP_SELF']) == "index.php") {echo "active";} ?>">
-                    <a class="nav-link" href="/client/index.php">Home</a>
+                    <a class="nav-link" href="/client/index.php"><?php echo __('client_portal_home', 'Home'); ?></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?php if (basename($_SERVER['PHP_SELF']) == "tickets.php" || basename($_SERVER['PHP_SELF']) == "ticket_add.php" || basename($_SERVER['PHP_SELF']) == "ticket.php") {echo "active";} ?>" href="/client/tickets.php">Tickets</a>
+                    <a class="nav-link <?php if (basename($_SERVER['PHP_SELF']) == "tickets.php" || basename($_SERVER['PHP_SELF']) == "ticket_add.php" || basename($_SERVER['PHP_SELF']) == "ticket.php") {echo "active";} ?>" href="/client/tickets.php"><?php echo __('client_portal_tickets', 'Tickets'); ?></a>
                 </li>
 
                 <?php if (($session_contact_primary == 1 || $session_contact_is_billing_contact) && $config_module_enable_accounting == 1) { ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle <?php echo in_array(basename($_SERVER['PHP_SELF']), ['invoices.php', 'quotes.php', 'autopay.php']) ? 'active' : ''; ?>" href="#" id="navbarDropdown1" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Finance
+                            <?php echo __('client_portal_finance', 'Finance'); ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown1">
-                            <a class="dropdown-item" href="/client/invoices.php">Invoices</a>
-                            <a class="dropdown-item" href="/client/recurring_invoices.php">Recurring Invoices</a>
-                            <a class="dropdown-item" href="/client/quotes.php">Quotes</a>
-                            <a class="dropdown-item" href="/client/saved_payment_methods.php">Saved Payments</a>
+                            <a class="dropdown-item" href="/client/invoices.php"><?php echo __('client_portal_invoices', 'Invoices'); ?></a>
+                            <a class="dropdown-item" href="/client/recurring_invoices.php"><?php echo __('client_portal_recurring_invoices', 'Recurring Invoices'); ?></a>
+                            <a class="dropdown-item" href="/client/quotes.php"><?php echo __('client_portal_quotes', 'Quotes'); ?></a>
+                            <a class="dropdown-item" href="/client/saved_payment_methods.php"><?php echo __('client_portal_saved_payments', 'Saved Payments'); ?></a>
                         </div>
                     </li>
                 <?php } ?>
@@ -66,15 +66,15 @@ header("X-Frame-Options: DENY"); // Legacy
                 <?php if ($config_module_enable_itdoc && ($session_contact_primary == 1 || $session_contact_is_technical_contact)) { ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle <?php echo in_array(basename($_SERVER['PHP_SELF']), ['documents.php', 'contacts.php', 'domains.php', 'certificates.php']) ? 'active' : ''; ?>" href="#" id="navbarDropdown2" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Technical
+                            <?php echo __('client_portal_technical', 'Technical'); ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                            <a class="dropdown-item" href="/client/contacts.php">Contacts</a>
-                            <a class="dropdown-item" href="/client/assets.php">Assets</a>
-                            <a class="dropdown-item" href="/client/documents.php">Documents</a>
-                            <a class="dropdown-item" href="/client/domains.php">Domains</a>
-                            <a class="dropdown-item" href="/client/certificates.php">Certificates</a>
-                            <a class="dropdown-item" href="/client/ticket_view_all.php">All tickets</a>
+                            <a class="dropdown-item" href="/client/contacts.php"><?php echo __('client_portal_contacts', 'Contacts'); ?></a>
+                            <a class="dropdown-item" href="/client/assets.php"><?php echo __('client_portal_assets', 'Assets'); ?></a>
+                            <a class="dropdown-item" href="/client/documents.php"><?php echo __('client_portal_documents', 'Documents'); ?></a>
+                            <a class="dropdown-item" href="/client/domains.php"><?php echo __('client_portal_domains', 'Domains'); ?></a>
+                            <a class="dropdown-item" href="/client/certificates.php"><?php echo __('client_portal_certificates', 'Certificates'); ?></a>
+                            <a class="dropdown-item" href="/client/ticket_view_all.php"><?php echo __('client_portal_all_tickets', 'All tickets'); ?></a>
                         </div>
                     </li>
                 <?php } ?>
@@ -105,14 +105,17 @@ header("X-Frame-Options: DENY"); // Legacy
             </ul><!-- End left nav -->
 
             <ul class="nav navbar-nav pull-right">
+                <li class="nav-item">
+                    <?php require_once $_SERVER['DOCUMENT_ROOT'] . "/includes/language_switcher.php"; ?>
+                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
                         <?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?>
                     </a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="/client/profile.php"><i class="fas fa-fw fa-user mr-2"></i>Account</a>
+                        <a class="dropdown-item" href="/client/profile.php"><i class="fas fa-fw fa-user mr-2"></i><?php echo __('client_portal_account', 'Account'); ?></a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/client/post.php?logout"><i class="fas fa-fw fa-sign-out-alt mr-2"></i>Sign out</a>
+                        <a class="dropdown-item" href="/client/post.php?logout"><i class="fas fa-fw fa-sign-out-alt mr-2"></i><?php echo __('client_portal_sign_out', 'Sign out'); ?></a>
                     </div>
                 </li>
             </ul>
@@ -142,7 +145,7 @@ header("X-Frame-Options: DENY"); // Legacy
                 <?php if ($session_company_logo) { ?>
                     <img height="48" width="142" class="img-fluid float-right" src="<?php echo "/uploads/settings/$session_company_logo"; ?>">
                 <?php } ?>
-            <h4>Welcome, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h4>
+            <h4><?php echo __('client_portal_welcome', 'Welcome'); ?>, <strong><?php echo stripslashes(nullable_htmlentities($session_contact_name)); ?></strong>!</h4>
         </div>
     </div>
     <hr>

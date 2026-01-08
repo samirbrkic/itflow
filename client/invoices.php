@@ -17,7 +17,7 @@ if ($session_contact_primary == 0 && !$session_contact_is_billing_contact) {
 $invoices_sql = mysqli_query($mysqli, "SELECT * FROM invoices WHERE invoice_client_id = $session_client_id AND invoice_status != 'Draft' ORDER BY invoice_date DESC");
 ?>
 
-<h3>Invoices</h3>
+<h3><?php echo __('client_portal_invoices', 'Invoices'); ?></h3>
 <div class="row">
 
     <div class="col-md-10">
@@ -26,11 +26,11 @@ $invoices_sql = mysqli_query($mysqli, "SELECT * FROM invoices WHERE invoice_clie
             <thead class="thead-dark">
             <tr>
                 <th>#</th>
-                <th>Scope</th>
-                <th>Amount</th>
-                <th>Date</th>
-                <th>Due</th>
-                <th>Status</th>
+                <th><?php echo __('client_portal_ticket_subject', 'Scope'); ?></th>
+                <th><?php echo __('client_portal_invoice_amount', 'Amount'); ?></th>
+                <th><?php echo __('client_portal_invoice_date', 'Date'); ?></th>
+                <th><?php echo __('client_portal_invoice_due', 'Due'); ?></th>
+                <th><?php echo __('client_portal_invoice_status', 'Status'); ?></th>
             </tr>
             </thead>
             <tbody>

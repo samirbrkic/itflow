@@ -16,7 +16,7 @@ if ($session_contact_primary == 0 && !$session_contact_is_technical_contact) {
 $domains_sql = mysqli_query($mysqli, "SELECT domain_id, domain_name, domain_expire FROM domains WHERE domain_client_id = $session_client_id AND domain_archived_at IS NULL ORDER BY domain_expire ASC");
 ?>
 
-    <h3>Domains</h3>
+    <h3><?php echo __('client_portal_domains', 'Domains'); ?></h3>
     <div class="row">
 
         <div class="col-md-10">
@@ -24,8 +24,8 @@ $domains_sql = mysqli_query($mysqli, "SELECT domain_id, domain_name, domain_expi
             <table class="table tabled-bordered border border-dark">
                 <thead class="thead-dark">
                 <tr>
-                    <th>Domain Name</th>
-                    <th>Expiry</th>
+                    <th><?php echo __('client_portal_domain_name', 'Domain Name'); ?></th>
+                    <th><?php echo __('client_portal_domain_expire', 'Expiry'); ?></th>
                 </tr>
                 </thead>
                 <tbody>
