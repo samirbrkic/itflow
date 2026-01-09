@@ -1,0 +1,860 @@
+/* ========================================
+   CALM ENTERPRISE DESIGN - ADMINLTE OVERRIDES
+   Extends AdminLTE with Calm Indigo Design System
+   Agent & Admin Sections Only
+   ======================================== */
+
+:root {
+    /* Calm Indigo Base Colors */
+    --bg: #EEF2F7;
+    --surface: #FFFFFF;
+    --surface-2: #F1F5F9;
+    --surface-elevated: #FFFFFF;
+    --border: #E2E8F0;
+    --text: #0F172A;
+    --text-muted: #475569;
+    
+    /* Primary Colors */
+    --primary: #4F5BD5;
+    --primary-hover: #3F4BC7;
+    --primary-soft: rgba(79, 91, 213, 0.10);
+    --focus-ring: rgba(79, 91, 213, 0.40);
+    
+    /* Status Colors */
+    --success: #16A34A;
+    --success-soft: rgba(22, 163, 74, 0.10);
+    --warning: #D97706;
+    --warning-soft: rgba(217, 119, 6, 0.12);
+    --danger: #DC2626;
+    --danger-soft: rgba(220, 38, 38, 0.10);
+    --info: #0284C7;
+    --info-soft: rgba(2, 132, 199, 0.10);
+    
+    /* Neutrals (Slate palette) */
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-300: #CBD5E1;
+    --gray-400: #94A3B8;
+    --gray-500: #64748B;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1E293B;
+    --gray-900: #0F172A;
+    
+    /* Shadows (calm, subtle) */
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.12);
+    --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.15);
+    --shadow-lg: 0 10px 24px rgba(15, 23, 42, 0.18);
+    
+    /* Transitions (reduced for calm UX) */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.625rem;
+    --radius-lg: 0.75rem;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========================================
+   GLOBAL OVERRIDES
+   ======================================== */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+}
+
+.content-wrapper {
+    background: var(--bg);
+}
+
+/* ========================================
+   ADMINLTE CARD OVERRIDES
+   ======================================== */
+
+.card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    transition: var(--transition-base);
+    background: var(--surface);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.card-title {
+    font-weight: 600;
+    color: var(--text);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-footer {
+    background: var(--gray-50);
+    border-top: 1px solid var(--border);
+    padding: 0.875rem 1.25rem;
+}
+
+/* ========================================
+   STAT CARDS (CLIENT PORTAL STYLE)
+   ======================================== */
+
+.stat-card {
+    border: none;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    transition: var(--transition-base);
+    background: var(--surface);
+    margin-bottom: 1.5rem;
+}
+
+.stat-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.stat-card-primary {
+    border-left: 4px solid var(--primary);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--primary-soft) 100%);
+}
+
+.stat-card-success {
+    border-left: 4px solid var(--success);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--success-soft) 100%);
+}
+
+.stat-card-danger {
+    border-left: 4px solid var(--danger);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--danger-soft) 100%);
+}
+
+.stat-card-warning {
+    border-left: 4px solid var(--warning);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--warning-soft) 100%);
+}
+
+.stat-card-info {
+    border-left: 4px solid var(--info);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--info-soft) 100%);
+}
+
+.stat-card-neutral {
+    border-left: 4px solid var(--gray-400);
+    background: linear-gradient(135deg, var(--surface) 0%, var(--gray-100) 100%);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.stat-value-primary { color: var(--primary); }
+.stat-value-success { color: var(--success); }
+.stat-value-danger { color: var(--danger); }
+.stat-value-warning { color: var(--warning); }
+.stat-value-info { color: var(--info); }
+.stat-value-neutral { color: var(--gray-600); }
+
+.stat-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
+/* ========================================
+   ICON BOXES
+   ======================================== */
+
+.icon-box {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.icon-box-primary {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.icon-box-success {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.icon-box-danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.icon-box-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.icon-box-info {
+    background: var(--info-soft);
+    color: var(--info);
+}
+
+.icon-box-neutral {
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+
+.icon-box:hover {
+    transform: scale(1.05);
+}
+
+.dashboard-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
+}
+
+/* ========================================
+   SIDEBAR REFINEMENTS
+   ======================================== */
+
+.main-sidebar {
+    box-shadow: var(--shadow-md);
+}
+
+.sidebar {
+    padding-top: 0.5rem;
+}
+
+.nav-sidebar .nav-link {
+    border-radius: var(--radius-md);
+    margin: 0.25rem 0.5rem;
+    transition: var(--transition-fast);
+}
+
+.nav-sidebar .nav-link:hover {
+    background: var(--primary-soft);
+    color: var(--primary) !important;
+}
+
+.nav-sidebar .nav-link.active {
+    background: var(--primary);
+    color: white !important;
+    box-shadow: var(--shadow-sm);
+}
+
+.nav-sidebar .nav-link p {
+    transition: var(--transition-fast);
+}
+
+.nav-treeview > .nav-item > .nav-link {
+    padding-left: 2rem;
+}
+
+/* ========================================
+   TOP NAVBAR REFINEMENTS
+   ======================================== */
+
+.main-header.navbar {
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.navbar-nav .nav-link:hover {
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+}
+
+.navbar-nav .nav-link:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: var(--transition-fast);
+    border: none;
+    padding: 0.5rem 1.25rem;
+}
+
+.btn:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-success {
+    background: var(--success);
+    color: white;
+}
+
+.btn-success:hover {
+    background: #159143;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #C72020;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #C26605;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-info {
+    background: var(--info);
+    color: white;
+}
+
+.btn-info:hover {
+    background: #0270AD;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary {
+    background: var(--gray-500);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: var(--gray-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* ========================================
+   MODERN TABLES
+   ======================================== */
+
+.table {
+    background: white;
+}
+
+.table-responsive {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    color: var(--text);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    border: none;
+    padding: 1rem;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition-fast);
+}
+
+.table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.table tbody td {
+    padding: 0.875rem 1rem;
+    vertical-align: middle;
+    border: none;
+}
+
+/* DataTables overrides */
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1rem;
+    transition: var(--transition-fast);
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+    outline: 2px solid var(--focus-ring);
+    border-color: var(--primary);
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.375rem 0.75rem;
+    transition: var(--transition-fast);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--primary) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--primary-soft) !important;
+    color: var(--primary) !important;
+    border: none !important;
+}
+
+/* ========================================
+   MODERN BADGES
+   ======================================== */
+
+.badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border: none;
+}
+
+.badge-primary {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.badge-success {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.badge-danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.badge-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.badge-info {
+    background: var(--info-soft);
+    color: var(--info);
+}
+
+.badge-secondary {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+/* ========================================
+   FORMS
+   ======================================== */
+
+.form-control {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    transition: var(--transition-fast);
+    background: white;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+    outline: none;
+}
+
+.form-control::placeholder {
+    color: var(--gray-400);
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+    background: var(--gray-100);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.alert {
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.alert-danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.alert-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.alert-info {
+    background: var(--info-soft);
+    color: var(--info);
+}
+
+/* ========================================
+   DROPDOWNS
+   ======================================== */
+
+.dropdown-menu {
+    border: none;
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-lg);
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    animation: slideInDown 0.2s ease-out;
+}
+
+.dropdown-item {
+    border-radius: var(--radius-md);
+    padding: 0.625rem 1rem;
+    transition: var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-color: var(--border);
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+
+.modal-content {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 1.25rem;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.modal-body {
+    padding: 1.25rem;
+}
+
+.modal-footer {
+    background: var(--gray-50);
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    padding: 1rem 1.25rem;
+}
+
+/* ========================================
+   BREADCRUMBS
+   ======================================== */
+
+.breadcrumb {
+    background: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted);
+}
+
+.breadcrumb-item.active {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.breadcrumb-item a {
+    color: var(--primary);
+    transition: var(--transition-fast);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover);
+    text-decoration: none;
+}
+
+/* ========================================
+   PAGINATION
+   ======================================== */
+
+.pagination .page-link {
+    color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    margin: 0 0.25rem;
+    transition: var(--transition-fast);
+}
+
+.pagination .page-link:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary);
+}
+
+.pagination .page-item.active .page-link {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.spinner-border {
+    border-width: 2px;
+}
+
+.spinner-border-sm {
+    border-width: 2px;
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.shadow-soft {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow-medium {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-large {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.rounded-modern {
+    border-radius: var(--radius-lg) !important;
+}
+
+.text-primary-custom {
+    color: var(--primary) !important;
+}
+
+.bg-primary-soft {
+    background: var(--primary-soft) !important;
+}
+
+.bg-success-soft {
+    background: var(--success-soft) !important;
+}
+
+.bg-danger-soft {
+    background: var(--danger-soft) !important;
+}
+
+.bg-warning-soft {
+    background: var(--warning-soft) !important;
+}
+
+.bg-info-soft {
+    background: var(--info-soft) !important;
+}
+
+/* ========================================
+   SMALL INFO BOXES (ADMINLTE COMPATIBILITY)
+   ======================================== */
+
+.small-box {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
+    border: none;
+}
+
+.small-box:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.small-box .inner h3 {
+    font-weight: 700;
+}
+
+.small-box .inner p {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.small-box .icon {
+    transition: var(--transition-base);
+}
+
+.small-box:hover .icon {
+    transform: scale(1.1);
+}
+
+/* Override AdminLTE default colors */
+.small-box.bg-info {
+    background: linear-gradient(135deg, var(--info) 0%, #0270AD 100%) !important;
+}
+
+.small-box.bg-success {
+    background: linear-gradient(135deg, var(--success) 0%, #159143 100%) !important;
+}
+
+.small-box.bg-warning {
+    background: linear-gradient(135deg, var(--warning) 0%, #C26605 100%) !important;
+}
+
+.small-box.bg-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #C72020 100%) !important;
+}
+
+/* ========================================
+   PAGE LOAD ANIMATION
+   ======================================== */
+
+.content-wrapper > .content {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ========================================
+   SCROLLBAR STYLING
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+}
