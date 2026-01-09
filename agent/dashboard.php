@@ -175,163 +175,198 @@ if ($user_config_dashboard_financial_enable == 1) {
     $vendors_added = intval($row['vendors_added']);
 ?>
 <div class="card card-body">
-    <!-- Icon Cards-->
+    <!-- Modern Stat Cards with Calm Indigo Design -->
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-primary" href="payments.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo numfmt_format_currency($currency_format, $total_income, "$session_company_currency"); ?></h3>
-                    <p>Income</p>
-                    <hr>
-                    <small>Receivables: <?php echo numfmt_format_currency($currency_format, $receivables, "$session_company_currency"); ?></small>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-hand-holding-usd"></i>
+        <!-- Income Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="payments.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-primary">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-primary dashboard-icon-box mr-3">
+                            <i class="fa fa-hand-holding-usd fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">Income</h6>
+                            <h2 class="stat-value stat-value-primary mb-0"><?php echo numfmt_format_currency($currency_format, $total_income, "$session_company_currency"); ?></h2>
+                            <small class="text-muted">Receivables: <?php echo numfmt_format_currency($currency_format, $receivables, "$session_company_currency"); ?></small>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-danger" href="expenses.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo numfmt_format_currency($currency_format, $total_expenses, "$session_company_currency"); ?></h3>
-                    <p>Expenses</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-shopping-cart"></i>
+        <!-- Expenses Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="expenses.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-danger">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-danger dashboard-icon-box mr-3">
+                            <i class="fa fa-shopping-cart fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">Expenses</h6>
+                            <h2 class="stat-value stat-value-danger mb-0"><?php echo numfmt_format_currency($currency_format, $total_expenses, "$session_company_currency"); ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-success" href="reports/profit_loss.php">
-                <div class="inner">
-                    <h3><?php echo numfmt_format_currency($currency_format, $profit, "$session_company_currency"); ?></h3>
-                    <p>Profit</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-balance-scale"></i>
+        <!-- Profit Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="reports/profit_loss.php" class="text-decoration-none">
+                <div class="stat-card stat-card-success">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-success dashboard-icon-box mr-3">
+                            <i class="fa fa-balance-scale fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">Profit</h6>
+                            <h2 class="stat-value stat-value-success mb-0"><?php echo numfmt_format_currency($currency_format, $profit, "$session_company_currency"); ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-info" href="reports/recurring_by_client.php">
-                <div class="inner">
-                    <h3><?php echo numfmt_format_currency($currency_format, $recurring_monthly_total, "$session_company_currency"); ?></h3>
-                    <p>Monthly Recurring Income</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-sync-alt"></i>
+        <!-- Monthly Recurring Income Card -->
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+            <a href="reports/recurring_by_client.php" class="text-decoration-none">
+                <div class="stat-card stat-card-info">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-info mr-3">
+                            <i class="fa fa-sync-alt fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">Monthly Recurring Income</h6>
+                            <h2 class="stat-value stat-value-info mb-0"><?php echo numfmt_format_currency($currency_format, $recurring_monthly_total, "$session_company_currency"); ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-6 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-pink" href="recurring_expenses.php">
-                <div class="inner">
-                    <h3><?php echo numfmt_format_currency($currency_format, $recurring_expense_monthly_total, "$session_company_currency"); ?></h3>
-                    <p>Monthly Recurring Expense</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-clock"></i>
+        <!-- Monthly Recurring Expense Card -->
+        <div class="col-lg-6 col-md-6 col-sm-12 mb-3">
+            <a href="recurring_expenses.php" class="text-decoration-none">
+                <div class="stat-card stat-card-warning">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-warning mr-3">
+                            <i class="fa fa-clock fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">Monthly Recurring Expense</h6>
+                            <h2 class="stat-value stat-value-warning mb-0"><?php echo numfmt_format_currency($currency_format, $recurring_expense_monthly_total, "$session_company_currency"); ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
         <?php if ($config_module_enable_ticketing && $config_module_enable_accounting) { ?>
-            <div class="col-lg-2 col-md-6 col-sm-12">
-                <!-- small box -->
-                <a class="small-box bg-secondary" href="reports/tickets_unbilled.php">
-                    <div class="inner">
-                        <h3><?php echo $unbilled_tickets; ?></h3>
-                        <p>Unbilled Ticket<?php if ($unbilled_tickets > 1 || $unbilled_tickets == 0) { echo "s"; } ?></p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-ticket-alt"></i>
+            <!-- Unbilled Tickets Card -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                <a href="reports/tickets_unbilled.php" class="text-decoration-none">
+                    <div class="stat-card stat-card-neutral">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box icon-box-neutral mr-3">
+                                <i class="fa fa-ticket-alt"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="stat-label mb-1">Unbilled Ticket<?php if ($unbilled_tickets > 1 || $unbilled_tickets == 0) { echo "s"; } ?></h6>
+                                <h2 class="stat-value stat-value-neutral mb-0"><?php echo $unbilled_tickets; ?></h2>
+                            </div>
+                        </div>
                     </div>
                 </a>
             </div>
         <?php } else { ?>
-            <div class="col-lg-3 col-md-6 col-sm-12">
-                <!-- small box -->
-                <a class="small-box bg-secondary" href="recurring_invoices.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                    <div class="inner">
-                        <h3><?php echo $recurring_invoices_added; ?></h3>
-                        <p>Recurring Invoices Added</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fa fa-file-invoice"></i>
+            <!-- Recurring Invoices Added Card -->
+            <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+                <a href="recurring_invoices.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                    <div class="stat-card stat-card-neutral">
+                        <div class="d-flex align-items-center">
+                            <div class="icon-box icon-box-neutral mr-3">
+                                <i class="fa fa-file-invoice"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="stat-label mb-1">Recurring Invoices Added</h6>
+                                <h2 class="stat-value stat-value-neutral mb-0"><?php echo $recurring_invoices_added; ?></h2>
+                            </div>
+                        </div>
                     </div>
                 </a>
             </div>
         <?php } ?>
 
-        <div class="col-lg-2 col-6">
-            <!-- small box -->
-            <a class="small-box bg-secondary" href="clients.php?leads=1&dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo $leads_added; ?></h3>
-                    <p><?php echo __('new_leads', 'New Leads'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-users"></i>
+        <!-- New Leads Card -->
+        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+            <a href="clients.php?leads=1&dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-neutral">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-neutral mr-3">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('new_leads', 'New Leads'); ?></h6>
+                            <h2 class="stat-value stat-value-neutral mb-0"><?php echo $leads_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-2 col-6">
-            <!-- small box -->
-            <a class="small-box bg-secondary" href="clients.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo $clients_added; ?></h3>
-                    <p>New Clients</p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-users"></i>
+        <!-- New Clients Card -->
+        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+            <a href="clients.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-neutral">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-neutral mr-3">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1">New Clients</h6>
+                            <h2 class="stat-value stat-value-neutral mb-0"><?php echo $clients_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-2 col-6">
-            <!-- small box -->
-            <a class="small-box bg-secondary" href="vendors.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo $vendors_added; ?></h3>
-                    <p><?php echo __('new_vendors', 'New Vendors'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-building"></i>
+        <!-- New Vendors Card -->
+        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+            <a href="vendors.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-neutral">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-neutral mr-3">
+                            <i class="fa fa-building"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('new_vendors', 'New Vendors'); ?></h6>
+                            <h2 class="stat-value stat-value-neutral mb-0"><?php echo $vendors_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-3 col-md-6 col-sm-12">
-            <!-- small box -->
-            <a class="small-box bg-secondary" href="trips.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo number_format($total_miles, 2); ?></h3>
-                    <p><?php echo __('miles_traveled', 'Miles Traveled'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-route"></i>
+        <!-- Miles Traveled Card -->
+        <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
+            <a href="trips.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-neutral">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-neutral mr-3">
+                            <i class="fa fa-route"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('miles_traveled', 'Miles Traveled'); ?></h6>
+                            <h2 class="stat-value stat-value-neutral mb-0"><?php echo number_format($total_miles, 2); ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
+    </div> <!-- /row -->
 
         <div class="col-md-12">
             <div class="card card-dark mb-3">
@@ -601,86 +636,109 @@ if ($user_config_dashboard_technical_enable == 1) {
 ?>
 
 <div class="card card-body">
-    <!-- Icon Cards-->
+    <!-- Modern Technical Stat Cards -->
     <div class="row">
-        <div class="col-lg-4 col-6">
-            <!-- small box -->
-            <a class="small-box bg-secondary" href="clients.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31">
-                <div class="inner">
-                    <h3><?php echo $clients_added; ?></h3>
-                    <p><?php echo __('new_clients', 'New Clients'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-users"></i>
+        <!-- New Clients Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="clients.php?dtf=<?php echo $year; ?>-01-01&dtt=<?php echo $year; ?>-12-31" class="text-decoration-none">
+                <div class="stat-card stat-card-neutral">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-neutral mr-3">
+                            <i class="fa fa-users fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('new_clients', 'New Clients'); ?></h6>
+                            <h2 class="stat-value stat-value-neutral mb-0"><?php echo $clients_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-6">
-            <a class="small-box bg-success" href="contacts.php">
-                <div class="inner">
-                    <h3><?php echo $contacts_added; ?></h3>
-                    <p><?php echo __('new_contacts', 'New Contacts'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-user"></i>
+        <!-- New Contacts Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="contacts.php" class="text-decoration-none">
+                <div class="stat-card stat-card-success">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-success mr-3">
+                            <i class="fa fa-user fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('new_contacts', 'New Contacts'); ?></h6>
+                            <h2 class="stat-value stat-value-success mb-0"><?php echo $contacts_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-6">
-            <a class="small-box bg-info" href="assets.php">
-                <div class="inner">
-                    <h3><?php echo $assets_added; ?></h3>
-                    <p><?php echo __('new_assets', 'New Assets'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-desktop"></i>
+        <!-- New Assets Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="assets.php" class="text-decoration-none">
+                <div class="stat-card stat-card-info">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-info mr-3">
+                            <i class="fa fa-desktop fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('new_assets', 'New Assets'); ?></h6>
+                            <h2 class="stat-value stat-value-info mb-0"><?php echo $assets_added; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-6">
-            <a class="small-box bg-danger" href="tickets.php">
-                <div class="inner">
-                    <h3><?php echo $active_tickets; ?></h3>
-                    <p><?php echo __('active_tickets', 'Active Tickets'); ?></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-ticket-alt"></i>
+        <!-- Active Tickets Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="tickets.php" class="text-decoration-none">
+                <div class="stat-card stat-card-danger">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-danger mr-3">
+                            <i class="fa fa-ticket-alt fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('active_tickets', 'Active Tickets'); ?></h6>
+                            <h2 class="stat-value stat-value-danger mb-0"><?php echo $active_tickets; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-6">
-            <a class="small-box bg-warning" href="domains.php?sort=domain_expire&order=ASC">
-                <div class="inner">
-                    <h3><?php echo $expiring_domains; ?></h3>
-                    <p><?php echo __('expiring_domains', 'Expiring Domains'); ?> <small><?php echo __('30_day', '30 Day'); ?></small></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-globe"></i>
+        <!-- Expiring Domains Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="domains.php?sort=domain_expire&order=ASC" class="text-decoration-none">
+                <div class="stat-card stat-card-warning">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-warning mr-3">
+                            <i class="fa fa-globe fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('expiring_domains', 'Expiring Domains'); ?> <small><?php echo __('30_day', '30 Day'); ?></small></h6>
+                            <h2 class="stat-value stat-value-warning mb-0"><?php echo $expiring_domains; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
 
-        <div class="col-lg-4 col-6">
-            <a class="small-box bg-primary" href="certificates.php?sort=certificate_expire&order=ASC">
-                <div class="inner">
-                    <h3><?php echo $expiring_certificates; ?></h3>
-                    <p><?php echo __('expiring_certificates', 'Expiring Certificates'); ?><small><?php echo __('30_day', '30 Day'); ?></small></p>
-                </div>
-                <div class="icon">
-                    <i class="fa fa-lock"></i>
+        <!-- Expiring Certificates Card -->
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+            <a href="certificates.php?sort=certificate_expire&order=ASC" class="text-decoration-none">
+                <div class="stat-card stat-card-primary">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-primary mr-3">
+                            <i class="fa fa-lock fa-lg"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="stat-label mb-1"><?php echo __('expiring_certificates', 'Expiring Certificates'); ?> <small><?php echo __('30_day', '30 Day'); ?></small></h6>
+                            <h2 class="stat-value stat-value-primary mb-0"><?php echo $expiring_certificates; ?></h2>
+                        </div>
+                    </div>
                 </div>
             </a>
         </div>
-        <!-- ./col -->
     </div> <!-- row -->
 
     <?php if ($your_tickets) { ?>

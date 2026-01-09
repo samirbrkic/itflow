@@ -36,6 +36,7 @@ header("X-Frame-Options: DENY");
     <link rel="stylesheet" href="/plugins/intl-tel-input/css/intlTelInput.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
     <link rel="stylesheet" href="/plugins/adminlte/css/adminlte.min.css">
+    <link rel="stylesheet" href="/css/itflow_admin_custom.css">
 
     <!-- Scripts -->
     <script src="/plugins/jquery/jquery.min.js"></script>
