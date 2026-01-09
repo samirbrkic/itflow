@@ -1228,3 +1228,314 @@ body {
     transform: scale(1.05);
 }
 
+/* ========================================
+   ADMIN SETTINGS & TABS ENHANCEMENTS
+   ======================================== */
+
+/* Settings Navigation Tabs */
+.nav-tabs {
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: -2px;
+    transition: var(--transition-fast);
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: var(--primary-soft);
+    color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.nav-tabs .nav-link.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+    background: transparent;
+}
+
+/* Settings Form Sections */
+.settings-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.settings-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.settings-section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-soft);
+    color: var(--primary);
+    margin-right: 1rem;
+}
+
+.settings-section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.settings-section-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Form Group Enhancements */
+.form-group label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-group label .text-danger {
+    color: var(--danger);
+}
+
+.input-group-text {
+    background: var(--gray-100);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.input-group-text i {
+    width: 1rem;
+    text-align: center;
+}
+
+/* Custom Checkbox/Radio Styling */
+.custom-control-label {
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* Switch Enhancements */
+.custom-switch .custom-control-label::before {
+    background-color: var(--gray-300);
+    border: none;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--primary);
+}
+
+.custom-switch .custom-control-label::after {
+    background-color: white;
+}
+
+/* Select Styling */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px 12px;
+    padding-right: 2.5rem;
+}
+
+/* Textarea Enhancements */
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* File Input */
+.form-control-file {
+    padding: 0.5rem 0;
+}
+
+/* ========================================
+   DATA DISPLAY IMPROVEMENTS
+   ======================================== */
+
+/* Key-Value Pairs */
+.data-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1.5rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+.data-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.data-value {
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+/* ========================================
+   LOADING STATES & SPINNERS
+   ======================================== */
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: var(--radius-lg);
+}
+
+.spinner-border {
+    border-width: 3px;
+    border-color: var(--primary-soft);
+    border-right-color: var(--primary);
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        var(--gray-200) 0%,
+        var(--gray-100) 50%,
+        var(--gray-200) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 60%;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .sidebar,
+    .main-header,
+    .card-tools,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+    
+    .content-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        page-break-inside: avoid;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY IMPROVEMENTS
+   ======================================== */
+
+/* Skip Link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    z-index: 9999;
+    border-radius: 0 0 var(--radius-md) 0;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Focus Visible (for keyboard navigation) */
+*:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid var(--text);
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+}
+
+
