@@ -118,6 +118,7 @@ body {
     margin-bottom: 1.5rem;
     transition: var(--transition-base);
     background: var(--surface);
+    overflow: visible;
 }
 
 .card:hover {
@@ -141,6 +142,8 @@ body {
 
 .card-body {
     padding: 1.25rem;
+    position: relative;
+    overflow: visible;
 }
 
 .card-footer {
@@ -432,7 +435,8 @@ body {
 .table-responsive {
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
 }
 
 .table thead th {
@@ -618,6 +622,8 @@ body {
     padding: 0.5rem;
     margin-top: 0.5rem;
     animation: slideInDown 0.2s ease-out;
+    z-index: 1050;
+    position: absolute;
 }
 
 .dropdown-item {
