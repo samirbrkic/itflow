@@ -904,8 +904,30 @@ if (isset($_GET['ai_ticket_summary'])) {
         $all_replies_text .= "\nReply Type: $reply_type Reply By: $reply_by: Reply Text: $reply_text";
     }
 
+    // Define language-specific instructions
+    $lang_instructions = '';
+    if ($user_language_code === 'de') {
+        $lang_instructions = "
+    **WICHTIG: Diese Zusammenfassung muss vollständig auf DEUTSCH verfasst werden.**
+    
+    Verwende die folgenden deutschen Überschriften:
+    - <h3>Hauptproblem</h3>
+    - <h3>Durchgeführte Maßnahmen</h3>
+    - <h3>Lösung/Nächste Schritte</h3>
+    
+    Schreibe den gesamten Text auf Deutsch, auch wenn das Ticket auf Englisch oder einer anderen Sprache ist.";
+    } else {
+        $lang_instructions = "
+    **IMPORTANT: This summary must be written entirely in ENGLISH.**
+    
+    Use the following English headers:
+    - <h3>Main Issue</h3>
+    - <h3>Actions Taken</h3>
+    - <h3>Resolution/Next Steps</h3>";
+    }
+
     $prompt = "
-    **IMPORTANT: Always respond in the same language as the ticket content (German, English, etc.). Detect the language from the ticket details and replies provided below.**
+    $lang_instructions
     
     Summarize the following IT support ticket and its responses in a concise, clear, and professional manner. 
     The summary should include:
@@ -932,7 +954,7 @@ if (isset($_GET['ai_ticket_summary'])) {
 
     Formatting instructions:
     - Use valid HTML tags only.
-    - Use <h3> for section headers. Create appropriate headers in the same language as the ticket content (e.g., \"Hauptproblem\" for German, \"Main Issue\" for English).
+    - Use <h3> for section headers as specified in the language instructions above.
     - Use <ul><li> for bullet points under each section.
     - Do NOT wrap the output in ```html or any other code fences.
     - Do NOT include <html>, <head>, or <body>.
@@ -944,7 +966,7 @@ if (isset($_GET['ai_ticket_summary'])) {
     $post_data = [
         "model" => "$model_name",
         "messages" => [
-            ["role" => "system", "content" => "Your task is to summarize IT support tickets with clear, concise details. Always respond in the same language as the ticket content."],
+            ["role" => "system", "content" => "Your task is to summarize IT support tickets with clear, concise details. CRITICAL: You must write the entire summary in $user_language, regardless of the language used in the ticket content. Always use $user_language for all text, headers, and bullet points."],
             ["role" => "user", "content" => $prompt]
         ],
         "temperature" => 0.3
