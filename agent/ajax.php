@@ -866,6 +866,31 @@ if (isset($_GET['ai_ticket_summary'])) {
     $url = $row['ai_provider_api_url'];
     $key = $row['ai_provider_api_key'];
 
+    // Get user's preferred language for the summary from cookie (set by i18n system)
+    $user_language = 'English'; // Default
+    $user_language_code = 'en';
+    $user_locale = 'en_US'; // Default
+    
+    // Check for language cookie (same logic as i18n.php)
+    if (isset($_COOKIE['itflow_language']) && !empty($_COOKIE['itflow_language'])) {
+        $user_locale = $_COOKIE['itflow_language'];
+    }
+    
+    // Map locale to language name and code
+    if (strpos($user_locale, 'de') === 0) {
+        $user_language = 'German';
+        $user_language_code = 'de';
+    } elseif (strpos($user_locale, 'fr') === 0) {
+        $user_language = 'French';
+        $user_language_code = 'fr';
+    } elseif (strpos($user_locale, 'es') === 0) {
+        $user_language = 'Spanish';
+        $user_language_code = 'es';
+    } elseif (strpos($user_locale, 'it') === 0) {
+        $user_language = 'Italian';
+        $user_language_code = 'it';
+    }
+
     // Retrieve the ticket_id from POST
     $ticket_id = intval($_POST['ticket_id']);
 
