@@ -125,7 +125,6 @@ body {
 
 .card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
     z-index: 2;
 }
 
@@ -171,7 +170,6 @@ body {
 
 .stat-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
 }
 
 .stat-card-primary {
@@ -279,7 +277,7 @@ body {
 }
 
 .icon-box:hover {
-    transform: scale(1.05);
+    /* No transform to avoid movement */
 }
 
 .dashboard-icon-box {
@@ -368,7 +366,6 @@ body {
 
 .btn-primary:hover {
     background: var(--primary-hover);
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -379,7 +376,6 @@ body {
 
 .btn-success:hover {
     background: #159143;
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -390,7 +386,6 @@ body {
 
 .btn-danger:hover {
     background: #C72020;
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -401,7 +396,6 @@ body {
 
 .btn-warning:hover {
     background: #C26605;
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -412,7 +406,6 @@ body {
 
 .btn-info:hover {
     background: #0270AD;
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -423,7 +416,6 @@ body {
 
 .btn-secondary:hover {
     background: var(--gray-600);
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -644,30 +636,27 @@ body {
     margin-top: 0.5rem;
     z-index: 9999 !important;
     position: absolute;
-    /* Prevent jump during position calculation */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0s linear 0.15s;
+    /* Prevent FOUC and jumping */
+    display: none;
 }
 
-/* Show dropdown smoothly after positioning */
+/* Show dropdown without animation to prevent jump */
 .dropdown-menu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-    transition: opacity 0.15s ease-out, transform 0.15s ease-out, visibility 0s;
+    display: block;
+    animation: none !important;
 }
 
-/* Remove slideInDown animation that causes jump */
-@keyframes slideInDown {
+/* Optional: Very subtle fade-in if desired (no jump) */
+.dropdown-menu.show {
+    animation: dropdownFadeIn 0.1s ease-out;
+}
+
+@keyframes dropdownFadeIn {
     from {
         opacity: 0;
-        transform: translateY(-10px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -854,7 +843,6 @@ table tr {
 
 .small-box:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
 }
 
 .small-box .inner h3 {
@@ -873,7 +861,7 @@ table tr {
 }
 
 .small-box:hover .icon {
-    transform: scale(1.1);
+    /* No transform to avoid movement */
 }
 
 /* Override AdminLTE default colors */
@@ -1150,7 +1138,6 @@ table tr {
     background: var(--primary-soft);
     border-color: var(--primary);
     color: var(--primary);
-    transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
@@ -1251,7 +1238,7 @@ table tr {
 }
 
 .nav-sidebar .nav-link:hover .nav-icon {
-    transform: scale(1.1);
+    /* No transform to avoid movement */
 }
 
 /* Sidebar user panel */
@@ -1265,7 +1252,7 @@ table tr {
 }
 
 .user-panel:hover .image {
-    transform: scale(1.05);
+    /* No transform to avoid movement */
 }
 
 /* ========================================
