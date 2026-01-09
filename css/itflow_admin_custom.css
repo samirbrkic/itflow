@@ -119,11 +119,14 @@ body {
     transition: var(--transition-base);
     background: var(--surface);
     overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
 .card:hover {
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
+    z-index: 2;
 }
 
 .card-header {
@@ -640,7 +643,7 @@ body {
     padding: 0.5rem;
     margin-top: 0.5rem;
     animation: slideInDown 0.2s ease-out;
-    z-index: 1050;
+    z-index: 9999 !important;
     position: absolute;
 }
 
@@ -658,6 +661,19 @@ body {
 .dropdown-divider {
     margin: 0.5rem 0;
     border-color: var(--border);
+}
+
+/* Ensure dropdown parent gets elevated z-index when open */
+.dropdown.show,
+.btn-group.show,
+.card:has(.dropdown.show),
+.card:has(.btn-group.show) {
+    z-index: 9998 !important;
+}
+
+/* Ensure table rows with dropdowns can overflow */
+table tr {
+    position: relative;
 }
 
 /* ========================================
